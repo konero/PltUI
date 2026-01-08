@@ -1,2 +1,2 @@
-# OpenToonzPaletteManager
-Manage palette files in the OpenToonz (.tpl) format.
+# PltUI
+A UI engine for searching, managing, creating and editing palette files (.tpl) compatible with OpenToonz/Tahoma2D.
