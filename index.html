@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPL Palette Manager</title>
+  <style>
+    :root {
+      --primary-color: #e06c75;
+      --accent-color: #d19a66;
+      --bg-color: #282c34;
+      --card-bg: #3a3f4b;
+      --input-bg-color: #2c313a;
+      --border-color: #21252b;
+      --border-light-color: #444;
+      --text-color: #e0e0e0;
+      --sub-text: #a0a0a0;
+      --success-color: #98c379;
+      --hue-filter-color: hsl(0, 100%, 50%);
+
+      --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.3), transparent);
+      --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.3), transparent);
+      --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.3), transparent);
+
+      --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --border-radius-xs: 3px;
+      --border-radius-sm: 4px;
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      --font-size-xs: 11px;
+      --font-size-sm: 12px;
+      --font-size-md: 13px;
+      --font-size-lg: 14px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-family-sans);
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 20px;
+      background: var(--border-color);
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .toolbar {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 6px 16px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    button:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #4a4a4a;
+      color: #fff;
+      border: 1px solid #222;
+    }
+
+    #fileInput {
+      display: none;
+    }
+    
+    .filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-light-color);
+      background: var(--input-bg-color);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search-group {
+      display: flex;
+      flex-grow: 1;
+      background: var(--input-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      overflow: hidden;
+      min-width: 250px;
+    }
+
+    #searchInput {
+      flex-grow: 1;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      font-size: var(--font-size-lg);
+      color: #fff;
+      outline: none;
+    }
+    #searchInput::placeholder { color: #888; }
+
+    #searchInput::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e06c75'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #searchInput::-webkit-search-cancel-button:hover {
+      opacity: 1;
+    }
+
+    .search-options {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      gap: 4px;
+    }
+
+    .search-options label {
+      display: grid;
+      place-content: center;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      border-radius: var(--border-radius-sm);
+      color: #aaa;
+      font-family: var(--font-family-code);
+      font-size: var(--font-size-lg);
+      user-select: none;
+    }
+
+    .search-options input { display: none; }
+
+    .search-options input:checked + span {
+      background: var(--border-light-color);
+      color: #fff;
+    }
+    .search-options span {
+      display: grid;
+      place-content: center;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--border-radius-sm);
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--font-size-sm);
+      color: var(--sub-text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sort-options {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sort-options select {
+      padding: 7px 10px;
+      background: var(--input-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      color: #fff;
+      font-size: var(--font-size-lg);
+      outline: none;
+    }
+
+    .sort-options .control-label {
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--sub-text);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+    }
+
+    .hue-filter-group {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hue-controls {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .hue-controls .control-group {
+      min-width: 200px;
+    }
+
+    .hue-color-preview {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background-color: var(--hue-filter-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .hue-controls span[id^="hue-"] {
+      font-size: var(--font-size-sm);
+      color: var(--sub-text);
+      width: 45px;
+      text-align: right;
+      font-family: var(--font-family-code);
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    
+    .color-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .color-id-label {
+      font-family: var(--font-family-code);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      padding: 5px 8px;
+      background: var(--input-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-xs);
+      color: var(--sub-text);
+      white-space: nowrap;
+    }
+
+    .color-role-label {
+      font-family: var(--font-family-code);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      padding: 5px 8px;
+      background: var(--input-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-xs);
+      color: var(--accent-color);
+      white-space: nowrap;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    .delete-btn {
+      position: static;
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 26px;
+      text-align: center;
+      font-weight: normal;
+      transition: all 0.2s;
+      opacity: 0.7;
+    }
+
+    .delete-btn:hover {
+      background: var(--primary-color);
+      opacity: 1;
+    }
+
+    .color-card.is-shadow { background-image: var(--shadow-grad); }
+    .color-card.is-highlight { background-image: var(--highlight-grad); }
+    .color-card.is-ao { background-image: var(--ao-grad); }
+    
+    .swatch-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .embedded-picker {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #000;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      border-radius: var(--border-radius-sm);
+      flex-shrink: 0;
+    }
+
+    .meta-inputs {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 4px;
+      height: 50px; /* Match swatch height */
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 4px 8px;
+      background: var(--input-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-xs);
+      font-size: var(--font-size-md);
+      color: #fff;
+    }
+
+    .color-name-input {
+      flex-grow: 1;
+      width: auto;
+    }
+
+    .trace-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .trace-check input[type="checkbox"],
+    .toggle-label input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: var(--input-bg-color);
+      margin: 0;
+      font: inherit;
+      color: currentColor;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-xs);
+      transform: translateY(-0.075em);
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+    }
+
+    .trace-check input[type="checkbox"]::before,
+    .toggle-label input[type="checkbox"]::before {
+      content: "";
+      width: 0.65em;
+      height: 0.65em;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em white;
+      transform-origin: bottom left;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+
+    .trace-check input[type="checkbox"]:checked::before,
+    .toggle-label input[type="checkbox"]:checked::before {
+      transform: scale(1.2);
+    }
+
+    .card-controls {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-light-color);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;      
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-inputs .control-label {
+      font-size: var(--font-size-xs);
+      color: var(--sub-text);
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .alpha-value {
+      font-size: 10px;
+      color: #888;
+      width: 25px;
+      text-align: right;
+      font-family: var(--font-family-code);
+    }
+
+    .alpha-slider {
+      flex: 1;
+      height: 4px;
+      cursor: pointer;
+      accent-color: var(--accent-color);
+      min-width: 50px;
+    }
+
+    .radio-group {
+      display: flex;
+      background: var(--input-bg-color);
+      padding: 2px;
+      border-radius: var(--border-radius-sm);
+    }
+
+    .radio-group label {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      padding: 4px 0;
+      cursor: pointer;
+      border-radius: 2px;
+      color: #888;
+    }
+
+    .radio-group input { display: none; }
+
+    .radio-group input:checked + label {
+      background: var(--border-light-color);
+      color: #fff;
+    }
+
+    #content {
+      padding: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 100px 20px;
+      color: #888;
+      border: 2px dashed var(--border-light-color);
+      border-radius: var(--border-radius-lg);
+      font-size: var(--font-size-lg);
+    }
+
+    .palette-pair-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .pair-group {
+      background: rgba(0,0,0,0.1);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      padding: 12px;
+    }
+
+    .pair-header {
+      font-family: var(--font-family-code);
+      color: var(--sub-text);
+      margin-bottom: 12px;
+      font-size: var(--font-size-lg);
+    }
+
+    .pair-colors {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <header>
+      <h1>Palette Manager</h1>
+      <div class="toolbar">
+        <button class="secondary" onclick="newPalette()">New Palette</button>
+        <button class="secondary" onclick="document.getElementById('fileInput').click()">Import File</button>
+        <button onclick="addColor()" id="addBtn" disabled>New Color</button>
+        <button onclick="exportPalette()" id="exportBtn" disabled>Export TPL</button>
+        <button onclick="exportJson()" id="exportJsonBtn" class="secondary" disabled>Export JSON</button>
+        <input type="file" id="fileInput" accept=".tpl,.xml,.txt" onchange="loadFile(event)">
+      </div>
+    </header>
+    
+    <div class="filter-bar">
+      <div class="filter-row">
+        <div class="search-group">
+          <input type="search" id="searchInput" placeholder="Filter by name (e.g., body_*)" oninput="renderPalette()">
+          <div class="search-options">
+            <label title="Match Case">
+              <input type="checkbox" id="matchCaseCheck" onchange="renderPalette()"><span>Aa</span>
+            </label>
+            <label title="Match Whole Word">
+              <input type="checkbox" id="matchWholeWordCheck" onchange="renderPalette()"><span>""</span>
+            </label>
+          </div>
+        </div>
+        <div class="view-options">
+          <label class="toggle-label"><input type="checkbox" id="pairedViewCheck" onchange="renderPalette()"> Group By Name</label>
+        </div>
+        <div class="sort-options">
+          <label for="sortSelect" class="control-label">Sort By</label>
+          <select id="sortSelect" onchange="renderPalette()">
+            <option value="default">File Order</option>
+            <option value="name">Name</option>
+            <option value="color">Color</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div id="id-copier" style="display: none;">
+          <button onclick="copyIdsToClipboard()">Copy Visible IDs</button>
+        </div>
+        <div class="hue-filter-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="hueFilterCheck" onchange="toggleHueControls()"> Filter by Hue
+          </label>
+          <div class="hue-controls" style="display: none;">
+            <div class="control-group">
+              <span class="control-label">HUE</span>
+              <span class="hue-color-preview"></span>
+              <input type="range" class="alpha-slider" id="hueSlider" min="0" max="360" value="0" oninput="updateHueUI()">
+              <span id="hue-val">0°</span>
+            </div>
+            <div class="control-group">
+              <span class="control-label">RANGE</span>
+              <input type="range" class="alpha-slider" id="hueThresholdSlider" min="0" max="180" value="10" oninput="updateHueUI()">
+              <span id="hue-threshold-val">±10°</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="content">
+      <div class="empty-state">
+        Import a palette file to begin editing
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let paletteData = null;
+    let colors = [];
+    let lastFilteredColors = [];
+
+    function loadFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        parsePalette(e.target.result);
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function parsePalette(xmlString) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+      const paletteNode = xmlDoc.querySelector('palette');
+      
+      if (!paletteNode) {
+        alert("Invalid file format.");
+        return;
+      }
+
+      paletteData = {
+        name: paletteNode.getAttribute('name'),
+        version: xmlDoc.querySelector('version')?.textContent.trim() || "71 0",
+        shortcuts: xmlDoc.querySelector('shortcuts')?.textContent.trim() || ""
+      };
+
+      colors = [];
+      const styles = xmlDoc.querySelectorAll('style');
+      const regex = /^\s*(_1\s+)?("[^"]+")([^\s]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
+
+      styles.forEach((style, index) => {
+        const match = style.textContent.trim().match(regex);
+        if (match) {
+          let rawName = match[3];
+          let role = 'none';
+          let cleanName = rawName;
+
+          if (rawName.endsWith('_sh')) {
+            role = 'shadow';
+            cleanName = rawName.slice(0, -3);
+          } else if (rawName.endsWith('_hl')) {
+            role = 'highlight';
+            cleanName = rawName.slice(0, -3);
+          } else if (rawName.endsWith('_ao')) {
+            role = 'ao';
+            cleanName = rawName.slice(0, -3);
+          }
+
+          colors.push({
+            hasTrace: !!match[1],
+            id: match[2],
+            name: cleanName,
+            appFlag: match[4],
+            r: parseInt(match[5]),
+            g: parseInt(match[6]),
+            b: parseInt(match[7]),
+            a: parseInt(match[8]),
+            role: role,
+            originalIndex: index
+          });
+        }
+      });
+
+      // Reset filters when a new file is loaded
+      resetUIState();
+
+      renderPalette();
+      document.getElementById('exportBtn').disabled = false;
+      document.getElementById('addBtn').disabled = false;
+      document.getElementById('exportJsonBtn').disabled = false;
+    }
+
+    function renderPalette() {
+      const content = document.getElementById('content');
+      const isPairedView = document.getElementById('pairedViewCheck').checked;
+      const idCopier = document.getElementById('id-copier');
+
+      if (colors.length === 0) {
+        content.innerHTML = '<div class="empty-state">Import a palette file to begin editing</div>';
+        idCopier.style.display = 'none';
+        return;
+      }
+
+      // If a file is loaded, the "Copy IDs" button area should always be visible to prevent layout shifts.
+      idCopier.style.display = 'block';
+
+      const filteredColors = getFilteredColors();
+      const sortedAndFilteredColors = sortColors(filteredColors);
+      lastFilteredColors = sortedAndFilteredColors;
+
+      if (sortedAndFilteredColors.length === 0) {
+        content.innerHTML = '<div class="empty-state">No colors match your filter</div>';
+        return;
+      }
+
+      if (isPairedView) {
+        renderPairedView(sortedAndFilteredColors);
+      } else {
+        renderGridView(sortedAndFilteredColors);
+      }
+    }
+
+    function getFilteredColors() {
+      const searchTerm = document.getElementById('searchInput').value;
+      const matchCase = document.getElementById('matchCaseCheck').checked;
+      const matchWholeWord = document.getElementById('matchWholeWordCheck').checked;
+      
+      let filteredColors = [...colors];
+
+      // Name filter
+      if (searchTerm) {
+        // Smart search: convert glob-like '*' to '.*' for regex
+        const pattern = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*');
+        const regex = new RegExp(matchWholeWord ? `^${pattern}$` : pattern, matchCase ? '' : 'i');
+        filteredColors = filteredColors.filter(c => {
+          let fullName = c.name;
+          if (c.role === 'shadow') fullName += '_sh';
+          else if (c.role === 'highlight') fullName += '_hl';
+          return regex.test(fullName);
+        });
+      }
+
+      // Hue filter
+      const hueFilterEnabled = document.getElementById('hueFilterCheck').checked;
+      if (hueFilterEnabled) {
+        const targetHue = parseInt(document.getElementById('hueSlider').value);
+        const threshold = parseInt(document.getElementById('hueThresholdSlider').value);
+
+        filteredColors = filteredColors.filter(c => {
+            const colorHsl = rgbToHsl(c.r, c.g, c.b);
+            // Only match colors with some saturation. Greys are hard to place by hue...
+            if (colorHsl.s < 0.1) return false; 
+            
+            const diff = Math.abs(colorHsl.h - targetHue);
+            const dist = Math.min(diff, 360 - diff);
+            return dist <= threshold;
+        });
+      }
+
+      return filteredColors;
+    }
+
+    function sortColors(colorsToSort) {
+      const sortType = document.getElementById('sortSelect').value;
+      
+      switch (sortType) {
+        case 'name':
+          return [...colorsToSort].sort((a, b) => {
+            let fullNameA = a.name + (a.role === 'shadow' ? '_sh' : a.role === 'highlight' ? '_hl' : '');
+            let fullNameB = b.name + (b.role === 'shadow' ? '_sh' : b.role === 'highlight' ? '_hl' : '');
+            return fullNameA.localeCompare(fullNameB);
+          });
+        case 'color':
+          return [...colorsToSort].sort((a, b) => {
+            const hslA = rgbToHsl(a.r, a.g, a.b);
+            const hslB = rgbToHsl(b.r, b.g, b.b);
+            // Group greys at the end
+            if (hslA.s < 0.1 && hslB.s > 0.1) return 1;
+            if (hslB.s < 0.1 && hslA.s > 0.1) return -1;
+            // Sort by hue, then saturation, then lightness
+            if (hslA.h !== hslB.h) return hslA.h - hslB.h;
+            if (hslA.s !== hslB.s) return hslB.s - hslA.s; // higher saturation first
+            return hslB.l - hslA.l; // higher lightness first
+          });
+        case 'default':
+        default:
+          // Sort by original index in the main `colors` array to restore file order
+          return [...colorsToSort].sort((a, b) => a.originalIndex - b.originalIndex);
+      }
+    }
+
+    function toggleHueControls() {
+      const isChecked = document.getElementById('hueFilterCheck').checked;
+      document.querySelector('.hue-controls').style.display = isChecked ? 'flex' : 'none';
+      renderPalette();
+    }
+
+    function resetUIState() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('matchCaseCheck').checked = false;
+      document.getElementById('matchWholeWordCheck').checked = false;
+      document.getElementById('pairedViewCheck').checked = false;
+      document.getElementById('sortSelect').value = 'default';
+      document.getElementById('hueFilterCheck').checked = false;
+      document.querySelector('.hue-controls').style.display = 'none';
+      document.getElementById('hueSlider').value = 0;
+      document.getElementById('hueThresholdSlider').value = 10;
+      updateHueUIDisplayOnly();
+    }
+
+    function updateHueUIDisplayOnly() {
+      const hue = document.getElementById('hueSlider').value;
+      const threshold = document.getElementById('hueThresholdSlider').value;
+      document.getElementById('hue-val').textContent = `${hue}°`;
+      document.getElementById('hue-threshold-val').textContent = `±${threshold}°`;
+      document.documentElement.style.setProperty('--hue-filter-color', `hsl(${hue}, 100%, 50%)`);
+    }
+
+    function updateHueUI() {
+      updateHueUIDisplayOnly();
+      renderPalette();
+    }
+
+    function renderGridView(filteredColors) {
+      const content = document.getElementById('content');
+      let html = '<div class="palette-grid">';
+      filteredColors.forEach(color => {
+        const originalIndex = colors.findIndex(c => c === color);
+        html += generateColorCardHTML(color, originalIndex);
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function renderPairedView(filteredColors) {
+      const content = document.getElementById('content');
+      const groups = {};
+
+      // Group by base name
+      filteredColors.forEach(color => {
+        if (!groups[color.name]) {
+          groups[color.name] = [];
+        }
+        groups[color.name].push(color);
+      });
+
+      let html = '<div class="palette-pair-grid">';
+      for (const name in groups) {
+        html += `<div class="pair-group">`;
+        html += `<div class="pair-header">${name}</div>`;
+        html += `<div class="pair-colors">`;
+        groups[name].forEach(color => {
+          const originalIndex = colors.findIndex(c => c === color);
+          html += generateColorCardHTML(color, originalIndex);
+        });
+        html += `</div></div>`;
+      }
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function generateColorCardHTML(color, idx) {
+      const hex = rgbToHex(color.r, color.g, color.b);
+      const cardClass = color.role !== 'none' ? `is-${color.role}` : '';
+      const idString = color.id.slice(1, -1);
+      const parts = idString.split('-');
+      const displayId = parts[parts.length - 1];
+      const roleLabel = {
+        'shadow': '_sh',
+        'highlight': '_hl',
+        'ao': '_ao',
+        'none': '&nbsp;'
+      }[color.role];
+
+      return `
+        <div class="color-card ${cardClass}" id="card-${idx}">
+          <div class="card-header">
+            <span class="color-id-label" title="Full ID: ${idString}">#${displayId}</span>
+            <input type="text" class="color-name-input" value="${color.name}" oninput="updateName(${idx}, this.value)" placeholder="Color Name">
+            <span class="color-role-label">${roleLabel}</span>
+            ${idx >= 2 ? `<button class="delete-btn" title="Delete color" onclick="deleteColor(${idx})">&times;</button>` : '<div style="width: 28px; flex-shrink: 0;"></div>'}
+          </div>
+          <div class="swatch-area">
+            <input type="color" class="embedded-picker" value="${hex}" oninput="updateColor(${idx}, this.value)">
+            <div class="meta-inputs">
+              <label class="trace-check toggle-label">
+                <input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="updateTrace(${idx}, this.checked)"> Trace Flag
+              </label>
+              <div class="control-group">
+                <span class="control-label">Alpha</span>
+                <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)">
+                <span id="alpha-val-${idx}" class="alpha-value">${color.a}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-controls">
+            <div class="radio-group">
+              <input type="radio" name="role-${idx}" id="r-none-${idx}" value="none" ${color.role === 'none' ? 'checked' : ''} onchange="updateRole(${idx}, 'none')"><label for="r-none-${idx}">Normal</label>
+              <input type="radio" name="role-${idx}" id="r-shd-${idx}" value="shadow" ${color.role === 'shadow' ? 'checked' : ''} onchange="updateRole(${idx}, 'shadow')"><label for="r-shd-${idx}">Shadow</label>
+              <input type="radio" name="role-${idx}" id="r-hgh-${idx}" value="highlight" ${color.role === 'highlight' ? 'checked' : ''} onchange="updateRole(${idx}, 'highlight')"><label for="r-hgh-${idx}">Highlight</label>
+              <input type="radio" name="role-${idx}" id="r-ao-${idx}" value="ao" ${color.role === 'ao' ? 'checked' : ''} onchange="updateRole(${idx}, 'ao')"><label for="r-ao-${idx}">AO</label>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function newPalette() {
+      const paletteName = prompt("Enter a name for the new palette:", "new_palette");
+      if (!paletteName) {
+        return; // User cancelled
+      }
+
+      paletteData = {
+        name: paletteName,
+        version: "71 0",
+        shortcuts: ""
+      };
+
+      colors = [
+        // Color 0: Transparent BG. Cannot be deleted.
+        {
+          hasTrace: false,
+          id: '"0"',
+          name: 'color_0',
+          appFlag: '0',
+          r: 255, g: 255, b: 255, a: 0,
+          role: 'none',
+          originalIndex: 0
+        },
+        // Color 1: Default Ink. Cannot be deleted.
+        {
+          hasTrace: false,
+          id: '"1"',
+          name: 'color_1',
+          appFlag: '0',
+          r: 0, g: 0, b: 0, a: 255,
+          role: 'none',
+          originalIndex: 1
+        }
+      ];
+
+      // Reset UI state
+      resetUIState();
+
+      renderPalette();
+      document.getElementById('exportBtn').disabled = false;
+      document.getElementById('addBtn').disabled = false;
+      document.getElementById('exportJsonBtn').disabled = false;
+    }
+
+    function addColor() {
+      if (!paletteData) return;
+
+      // Find the highest existing ID to generate a new one. The ID can be a simple
+      // number `"12"` or a complex string `"|-...-12"`. We need to robustly
+      // extract the numeric part at the end to find the true max ID.
+      const numericIds = colors.map(c => {
+        const idString = c.id.slice(1, -1); // remove quotes
+        const parts = idString.split('-');
+        return parseInt(parts[parts.length - 1], 10);
+      }).filter(id => !isNaN(id)); // Filter out any parsing failures
+
+      const maxId = numericIds.length > 0 ? Math.max(...numericIds) : -1;
+      const newNumericId = maxId + 1;
+
+      // Now, construct the new full ID string, preserving any prefix from the original IDs.
+      let newIdString;
+      if (colors.length > 0) {
+        const firstId = colors[0].id.slice(1, -1);
+        const lastDashIndex = firstId.lastIndexOf('-');
+
+        if (lastDashIndex !== -1) {
+          // Complex ID with prefix found, e.g., "|-1611507682_28145-0"
+          const prefix = firstId.substring(0, lastDashIndex + 1);
+          newIdString = `${prefix}${newNumericId}`;
+        } else {
+          // Simple numeric ID, e.g., "0"
+          newIdString = `${newNumericId}`;
+        }
+      } else {
+        // This case shouldn't happen if addColor is only enabled after loading a file,
+        // but as a fallback, we'll create a simple numeric ID.
+        newIdString = `${newNumericId}`;
+      }
+
+      const newColor = {
+        hasTrace: false,
+        id: `"${newIdString}"`,
+        name: 'new_color',
+        appFlag: '0', // Default appFlag
+        r: 0, g: 0, b: 0, // Default to black
+        a: 255, // Default to opaque
+        role: 'none',
+        originalIndex: colors.length
+      };
+
+      colors.push(newColor);
+      renderPalette();
+    }
+
+    function deleteColor(idx) {
+      // Per OpenToonz format, the first two colors (indices 0 and 1) are special
+      // and should not be deleted. They are required for transparency and default lines.
+      if (idx < 2) {
+        alert("The first two colors are required by OpenToonz and cannot be deleted.");
+        return;
+      }
+      colors.splice(idx, 1);
+      renderPalette();
+    }
+
+    function updateColor(idx, hex) {
+      colors[idx].r = parseInt(hex.substr(1, 2), 16);
+      colors[idx].g = parseInt(hex.substr(3, 2), 16);
+      colors[idx].b = parseInt(hex.substr(5, 2), 16);
+    }
+
+    function updateAlpha(idx, val) {
+      colors[idx].a = parseInt(val);
+      document.getElementById(`alpha-val-${idx}`).textContent = val;
+    }
+
+    function updateName(idx, val) { colors[idx].name = val; }
+    function updateTrace(idx, val) { colors[idx].hasTrace = val; }
+    
+    function updateRole(idx, role) {
+      colors[idx].role = role;
+      const card = document.getElementById(`card-${idx}`);
+      card.classList.remove('is-shadow', 'is-highlight', 'is-ao');
+      if (role !== 'none') card.classList.add(`is-${role}`);
+
+      const roleLabelEl = card.querySelector('.color-role-label');
+      if (roleLabelEl) {
+        roleLabelEl.innerHTML = {
+          'shadow': '_sh',
+          'highlight': '_hl',
+          'ao': '_ao',
+          'none': '&nbsp;'
+        }[role];
+      }
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function rgbToHsl(r, g, b) {
+      r /= 255, g /= 255, b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      return { h: h * 360, s: s, l: l };
+    }
+
+    async function copyIdsToClipboard() {
+      if (lastFilteredColors.length === 0) return;
+
+      const ids = lastFilteredColors.map(c => {
+        const idString = c.id.slice(1, -1);
+        const parts = idString.split('-');
+        return parts[parts.length - 1];
+      }).join(',');
+
+      const copyBtn = document.querySelector('#id-copier button');
+      if (!ids || !copyBtn) return;
+
+      await navigator.clipboard.writeText(ids);
+      const originalContent = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      copyBtn.disabled = true;
+      setTimeout(() => {
+        copyBtn.textContent = originalContent;
+        copyBtn.disabled = false;
+      }, 1500);
+    }
+
+    function exportJson() {
+      if (!paletteData) return;
+
+      const simplifiedColors = colors.map(c => {
+        const idString = c.id.slice(1, -1);
+        const parts = idString.split('-');
+        const numericId = parts[parts.length - 1];
+
+        return {
+          id: parseInt(numericId, 10),
+          fullId: idString,
+          name: c.name,
+          role: c.role,
+          hasTrace: c.hasTrace,
+          color: { r: c.r, g: c.g, b: c.b, a: c.a }
+        };
+      });
+
+      const jsonString = JSON.stringify(simplifiedColors, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${paletteData.name}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportPalette() {
+      if (!paletteData) return;
+      let xml = `<palette name="${paletteData.name}">\n  <version>\n    ${paletteData.version}\n  </version>\n  <styles>\n`;
+      colors.forEach(c => {
+        const trace = c.hasTrace ? '_1 ' : '';
+        let exportName = c.name;
+        if (c.role === 'shadow') exportName += '_sh';
+        else if (c.role === 'highlight') exportName += '_hl';
+        else if (c.role === 'ao') exportName += '_ao';
+
+        xml += `    <style>\n      ${trace}${c.id}${exportName} ${c.appFlag} ${c.r} ${c.g} ${c.b} ${c.a} \n    </style>\n`;
+      });
+      xml += `  </styles>\n  <stylepages>\n    <page>\n      <name>\n        colors \n      </name>\n      <indices>\n        ${colors.map((_, i) => i).join(' ')} \n      </indices>\n    </page>\n  </stylepages>\n  <shortcuts>\n    ${paletteData.shortcuts}\n  </shortcuts>\n</palette>`;
+
+      const blob = new Blob([xml], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${paletteData.name}.tpl`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
