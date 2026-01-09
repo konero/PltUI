@@ -13,320 +13,663 @@
   <link rel="icon" type="image/png" sizes="512x512" href="images/android-chrome-512x512.png">
 
   <style>
-    :root {
-      --primary-color: #e06c75;
-      --accent-color: #d19a66;
-      --bg-color: #282c34;
-      --card-bg: #3a3f4b;
-      --input-bg-color: #2c313a;
-      --border-color: #21252b;
-      --border-light-color: #444;
-      --text-color: #e0e0e0;
-      --sub-text: #a0a0a0;
-      --success-color: #98c379;
-      --hue-filter-color: hsl(0, 100%, 50%);
+/* ==========================================================================
+   Design Tokens / Theme
+   ========================================================================== */
+:root {
+  /* Colors */
+  --primary-color: #e06c75;
+  --accent-color: #ab641d;
+  --bg-color: #282c34;
+  --card-bg: #3a3f4b;
+  --input-bg-color: #2c313a;
+  --border-color: #21252b;
+  --border-light-color: #444;
+  --text-color: #e0e0e0;
+  --sub-text: #a0a0a0;
+  --success-color: #98c379;
+  --hue-filter-color: hsl(0, 100%, 50%);
 
-      /* Gradients for different roles */
-      --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.25), transparent);
-      --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.25), transparent);
-      --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.25), transparent);
+  /* Gradients (role-based) */
+  --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.25), transparent);
+  --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.25), transparent);
+  --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.25), transparent);
 
-      --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --border-radius-xs: 3px;
-      --border-radius-sm: 4px;
-      --border-radius-md: 6px;
-      --border-radius-lg: 8px;
-      --font-size-xs: 11px;
-      --font-size-sm: 12px;
-      --font-size-md: 13px;
-      --font-size-lg: 14px;
-    }
+  /* Typography */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: var(--font-family-sans);
-      background: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.5;
-      overflow: hidden; /* Handled by app-wrapper */
-    }
+  /* Sizing */
+  --border-radius-xs: 3px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
 
-    /* Layout structure */
-    .app-wrapper {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+}
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background: var(--border-color);
-      flex-wrap: wrap;
-      gap: 12px;
-      z-index: 100;
-    }
 
-    h1 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
-      color: #fff;
-      user-select: none;
-    }
+/* ==========================================================================
+   Base / Reset
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    .header-logo { 
-      height: 24px; 
-      width: 24px; 
-      border-radius: var(--border-radius-xs); 
-      object-fit: contain;
-    }
+body {
+  font-family: var(--font-family-sans);
+  background: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  overflow: hidden; /* handled by app-wrapper */
+}
 
-    .version-tag { 
-      font-family: var(--font-family-code); 
-      font-size: 11px; 
-      color: var(--sub-text); 
-      opacity: 0.6; 
-      font-weight: 400;
-      position: relative; top: 2px;
-    }
 
-    .toolbar { 
-      display: flex; 
-      gap: 8px; 
-      flex-wrap: wrap; 
-    }
-    
-    button {
-      padding: 6px 14px;
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: var(--border-radius-sm);
-      cursor: pointer;
-      font-size: var(--font-size-md);
-      font-weight: 600;
-      transition: all 0.2s;
-    }    
-    button:hover:not(:disabled) { opacity: 0.8; }
-    button:disabled { background: #555; color: #888; cursor: not-allowed; }
-    button.secondary { background: #4a4a4a; border: 1px solid #222; }
+/* ==========================================================================
+   App Layout
+   ========================================================================== */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    /* Filter Bar Area */
-    .filter-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border-light-color);
-      background: var(--input-bg-color);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--border-color);
+  flex-wrap: wrap;
+  z-index: 100;
+}
 
-    .filter-row { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 16px; 
-      align-items: center; 
-    }
-    .filter-row { min-height: 38px; } /* Prevents layout shift from hue filter */
+.app-footer {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  background: var(--border-color);
+  border-top: 1px solid var(--border-light-color);
+  text-align: center;
+  color: var(--sub-text);
+  font-size: 11px;
+}
 
-    .search-group {
-      display: flex;
-      flex-grow: 1;
-      background: var(--input-bg-color);
-      border: 1px solid var(--border-light-color);
-      border-radius: var(--border-radius-sm);
-      min-width: 250px;
-      transition: border-color 0.2s;
-    }
-    .search-group:focus-within { border-color: var(--accent-color); }
+.app-footer a {
+  color: var(--sub-text);
+  text-decoration: none;
+}
 
-    #searchInput {
-      flex: 1;
-      padding: 8px 12px;
-      background: transparent;
-      border: none;
-      color: #fff;
-      outline: none;
-      font-size: var(--font-size-lg);
-    }
+.app-footer a:hover {
+  text-decoration: underline;
+}
 
-    .search-options { display: flex; align-items: center; padding-right: 4px; }
-    .search-options label {
-      display: grid;
-      place-content: center;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      color: #777;
-      font-family: var(--font-family-code);
-      font-weight: bold;
-      transition: color 0.2s;
-    }    
-    .search-options input[type="checkbox"] { display: none; }
-    .search-options input:checked + span { background: var(--border-light-color); color: #fff; border-radius: 4px; }    
-    .search-options span { display: grid; place-content: center; width: 24px; height: 24px; }
 
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: var(--font-size-sm);
-      color: var(--sub-text);
-      cursor: pointer;
-      user-select: none;
-    }
-    .toggle-label:hover { color: #fff; }
+/* ==========================================================================
+   Header Elements
+   ========================================================================== */
+h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #fff;
+  user-select: none;
+}
 
-    .sort-options { display: flex; align-items: center; gap: 8px; }
-    .sort-label {
-      font-size: var(--font-size-sm);
-      color: var(--sub-text);
-      user-select: none;
-    }
-    .sort-options select {
-      padding: 8px 12px; background: var(--input-bg-color);
-      border: 1px solid var(--border-light-color); border-radius: var(--border-radius-sm);
-      color: #fff; font-size: var(--font-size-sm); outline: none; cursor: pointer;
-    }
+.header-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--border-radius-xs);
+  object-fit: contain;
+}
 
-    /* Content Area with custom scrollbar */
-    #content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      background: var(--bg-color);
-    }
-    #content::-webkit-scrollbar { width: 8px; }
-    #content::-webkit-scrollbar-track { background: var(--bg-color); }
-    #content::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
-    #content::-webkit-scrollbar-thumb:hover { background: #555; }
+.version-tag {
+  position: relative;
+  top: 2px;
+  font-family: var(--font-family-code);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--sub-text);
+  opacity: 0.6;
+}
 
-    /* Hue Filter UI */
-    .hue-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; padding: 4px 0; }
-    .hue-color-preview { width: 14px; height: 14px; border-radius: 2px; border: 1px solid #000; flex-shrink: 0; }
-    .hue-val-text { font-family: var(--font-family-code); font-size: 11px; color: var(--sub-text); width: 35px; }
-    
-    /* Grid layout */
-    .palette-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-    }
-    
-    .color-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-md);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }    
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 
-    .color-id-badge, .color-role-badge {
-      font-family: var(--font-family-code);
-      font-size: 11px;
-      padding: 4px 6px;
-      background: var(--input-bg-color);
-      border: 1px solid var(--border-light-color);
-      border-radius: 2px;
-      color: var(--sub-text);
-      user-select: none;
-    }
-    .color-role-badge { color: var(--accent-color); min-width: 35px; text-align: center; }
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+button {
+  padding: 6px 14px;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  transition: all 0.2s;
+}
 
-    .delete-btn {
-      width: 24px; height: 24px; border-radius: 50%; border: none;
-      background: rgba(0,0,0,0.2); color: #fff; cursor: pointer;
-      display: grid; place-content: center; font-size: 16px; padding: 0;
-      transition: background 0.2s;
-    }
-    .delete-btn:hover { background: var(--primary-color); }
+button:hover:not(:disabled) {
+  opacity: 0.8;
+}
 
-    /* Role Background States */
-    .color-card.is-shadow { background-image: var(--shadow-grad); border-color: rgba(102, 106, 209, 0.4); }
-    .color-card.is-highlight { background-image: var(--highlight-grad); border-color: rgba(231, 76, 60, 0.4); }
-    .color-card.is-ao { background-image: var(--ao-grad); border-color: rgba(152, 195, 121, 0.4); }
-    
-    .swatch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .color-picker-input { 
-      width: 48px; height: 48px; border: 1px solid #000; 
-      cursor: pointer; border-radius: 4px; background: none; padding: 0;
-    }
-    .meta-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+button:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
 
-    .text-input {
-      width: 100%; padding: 6px 10px; background: var(--input-bg-color);
-      border: 1px solid var(--border-light-color); border-radius: 4px; color: #fff;
-      font-size: var(--font-size-md);
-    }
-    .text-input:focus { border-color: var(--accent-color); outline: none; }
+button.secondary {
+  background: #4a4a4a;
+  border: 1px solid #222;
+}
 
-    .alpha-row { display: flex; align-items: center; gap: 10px; }
-    .alpha-slider { flex: 1; accent-color: var(--accent-color); height: 4px; cursor: pointer; }
 
-    /* Custom Radio Styling for Roles */
-    .role-selector { display: flex; background: var(--input-bg-color); padding: 2px; border-radius: 6px; border: 1px solid var(--border-light-color); }
-    .role-selector label { flex: 1; text-align: center; font-size: 10px; padding: 5px; cursor: pointer; color: #777; font-weight: bold; letter-spacing: 0.05em; }
-    .role-selector input { display: none; }
-    .role-selector input:checked + label { background: var(--card-bg); color: #fff; border-radius: 4px; }
+/* ==========================================================================
+   Filter Bar
+   ========================================================================== */
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--input-bg-color);
+  border-bottom: 1px solid var(--border-light-color);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
 
-    .app-footer {
-      flex-shrink: 0; background: var(--border-color); border-top: 1px solid var(--border-light-color);
-      padding: 10px 20px; text-align: center; color: var(--sub-text); font-size: 11px;
-    }
-    .app-footer a { color: var(--sub-text); text-decoration: none; }
-    .app-footer a:hover { text-decoration: underline; }
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  min-height: 38px; /* prevents layout shift */
+}
 
-    .empty-state {
-      text-align: center; padding: 80px 40px; color: #555; border: 2px dashed var(--border-light-color); border-radius: 12px;
-      margin: 0;
-    }
 
-    /* Checkbox appearance */
-    input[type="checkbox"] {
-      -webkit-appearance: none;
-      appearance: none;
-      background-color: var(--input-bg-color);
-      border: 1px solid var(--border-light-color);
-      width: 15px; height: 15px;
-      border-radius: var(--border-radius-xs);
-      display: grid;
-      place-content: center;
-      cursor: pointer;
-      position: relative;
-    }
-    input[type="checkbox"]::before {
-      content: "";
-      width: 0.75em;
-      height: 0.75em;
-      transform: scale(0);
-      transition: 120ms transform ease-in-out;
-      box-shadow: inset 1em 1em white;
-      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-    }
-    input[type="checkbox"]:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
-    input[type="checkbox"]:checked::before { transform: scale(1); }
+/* Search */
+.search-group {
+  display: flex;
+  flex-grow: 1;
+  min-width: 250px;
+  background: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: var(--border-radius-sm);
+  transition: border-color 0.2s;
+}
 
-    /* Mobile Breakpoints */
-    @media (max-width: 650px) {
-      header { justify-content: center; }
-      .toolbar { width: 100%; justify-content: center; }
-      .filter-row { flex-direction: column; align-items: stretch; gap: 10px; }
-      .search-group { width: 100%; min-width: 100%; }
-      .hue-controls { justify-content: center; }
-    }
+.search-group:focus-within {
+  border-color: var(--accent-color);
+}
+
+#searchInput {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: var(--font-size-lg);
+  outline: none;
+}
+
+.search-options {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.search-options label {
+  display: grid;
+  place-content: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-family: var(--font-family-code);
+  font-weight: bold;
+  color: #777;
+  transition: color 0.2s;
+}
+
+.search-options span {
+  display: grid;
+  place-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.search-options input[type="checkbox"] {
+  display: none;
+}
+
+.search-options input:checked + span {
+  background: var(--border-light-color);
+  color: #fff;
+  border-radius: 4px;
+}
+
+
+/* Sort / Toggles */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-sm);
+  color: var(--sub-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label:hover {
+  color: #fff;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-label {
+  font-size: var(--font-size-sm);
+  color: var(--sub-text);
+}
+
+.sort-options select {
+  padding: 8px 12px;
+  background: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: var(--border-radius-sm);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  outline: none;
+}
+
+
+/* ==========================================================================
+   Content Area
+   ========================================================================== */
+#content {
+  flex: 1;
+  padding: 20px;
+  background: var(--bg-color);
+  overflow-y: auto;
+}
+
+/* Scrollbar */
+#content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#content::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+#content::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+#content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+/* ==========================================================================
+   Hue Filter UI
+   ========================================================================== */
+.hue-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.hue-color-preview {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid #000;
+  flex-shrink: 0;
+}
+
+.hue-val-text {
+  width: 35px;
+  font-family: var(--font-family-code);
+  font-size: 11px;
+  color: var(--sub-text);
+}
+
+
+/* ==========================================================================
+   Palette Grid & Cards
+   ========================================================================== */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.color-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* Role states */
+.color-card.is-shadow {
+  background-image: var(--shadow-grad);
+  border-color: rgba(102, 106, 209, 0.4);
+}
+
+.color-card.is-highlight {
+  background-image: var(--highlight-grad);
+  border-color: rgba(231, 76, 60, 0.4);
+}
+
+.color-card.is-ao {
+  background-image: var(--ao-grad);
+  border-color: rgba(152, 195, 121, 0.4);
+}
+
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-header .text-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.color-id-badge,
+.color-role-badge {
+  font-family: var(--font-family-code);
+  font-size: 11px;
+  padding: 4px 6px;
+  background: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: 2px;
+  color: var(--sub-text);
+  user-select: none;
+}
+
+.color-role-badge {
+  min-width: 35px;
+  text-align: center;
+  color: var(--accent-color);
+}
+
+.delete-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: var(--primary-color);
+}
+
+
+/* Swatches & Inputs */
+.swatch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.color-picker-input {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.meta-inputs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: 4px;
+  color: #fff;
+  font-size: var(--font-size-md);
+}
+
+.text-input:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+
+/* Alpha Slider */
+.alpha-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.alpha-slider { 
+  flex: 1; 
+  height: 6px; 
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(0, 0, 0, 0.34);
+  border-radius: 3px;
+  outline: none;
+}
+.alpha-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  cursor: pointer;
+  border: 2px solid var(--sub-text);
+}
+.alpha-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  cursor: pointer;
+  border: 2px solid var(--sub-text);
+}
+
+
+/* ==========================================================================
+   Preview Card
+   ========================================================================== */
+.color-card-preview {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 0;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.preview-name {
+  padding: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  word-break: break-word;
+}
+
+.preview-badge {
+  position: absolute;
+  padding: 4px 6px;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-family-code);
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.preview-badge.top-right { top: 4px; right: 4px; }
+.preview-badge.bottom-left { bottom: 4px; left: 4px; }
+.preview-badge.bottom-right { bottom: 4px; right: 4px; }
+
+
+/* ==========================================================================
+   Role Selector (Custom Radio)
+   ========================================================================== */
+.role-selector {
+  display: flex;
+  padding: 2px;
+  background: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: 6px;
+}
+
+.role-selector input {
+  display: none;
+}
+
+.role-selector label {
+  flex: 1;
+  padding: 5px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: #777;
+  cursor: pointer;
+}
+
+.role-selector input:checked + label {
+  background: var(--card-bg);
+  color: #fff;
+  border-radius: 4px;
+}
+
+
+/* ==========================================================================
+   Checkbox Styling
+   ========================================================================== */
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  background-color: var(--input-bg-color);
+  border: 1px solid var(--border-light-color);
+  border-radius: var(--border-radius-xs);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  appearance: none;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  width: 0.75em;
+  height: 0.75em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em white;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+.empty-state {
+  margin: 0;
+  padding: 80px 40px;
+  text-align: center;
+  color: #555;
+  border: 2px dashed var(--border-light-color);
+  border-radius: 12px;
+}
+
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 650px) {
+  header {
+    justify-content: center;
+  }
+
+  .toolbar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .search-group {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .hue-controls {
+    justify-content: center;
+  }
+}
   </style>
 </head>
 <body>
@@ -352,12 +695,23 @@
             <option value="name">Name</option>
             <option value="color">Color</option>
           </select>
+          <select id="sortDir" onchange="renderPalette()" style="width: 50px; padding: 8px 5px;">
+            <option value="asc">↑</option>
+            <option value="desc">↓</option>
+          </select>
         </div>
       </div>
 
       <!-- Actions and Hue Row -->
       <div class="filter-row" style="align-items: center;">
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span class="sort-label">View Type:</span>
+          <div class="role-selector" style="width: auto; display: inline-flex;">
+            <input type="radio" name="view-mode" id="view-edit" value="edit" checked onchange="renderPalette()">
+            <label for="view-edit">EDITOR</label>
+            <input type="radio" name="view-mode" id="view-preview" value="preview" onchange="renderPalette()">
+            <label for="view-preview">PREVIEW</label>
+          </div>
           <span class="sort-label">Group By:</span>
           <label class="toggle-label">
             <input type="checkbox" id="pairedViewCheck" onchange="renderPalette()"> 
@@ -399,7 +753,7 @@
      */
     const CONFIG = {
       APP_NAME: "PltUI",
-      VERSION: "v1.0.1",
+      VERSION: "v1.0.2",
       AUTHOR: "KONERO",
       DEFAULT_TPL_VER: "71 0",
       ROLES: {
@@ -456,6 +810,12 @@
       return parts[parts.length - 1];
     };
 
+    function getContrastColor(r, g, b) {
+      // Calculate relative luminance
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5 ? '#000' : '#fff';
+    }
+
     function handleFile(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -479,7 +839,7 @@
 
       colors = [];
       const styles = xmlDoc.querySelectorAll('style');
-      // TPL Regex: matches trace, ID, name, appFlag, R, G, B, A
+      // TPL Regex: matches trace, ID, name, tagID, R, G, B, A
       const styleRegex = /^\s*(_1\s+)?("[^"]+")([^\s]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
 
       styles.forEach((style, index) => {
@@ -503,7 +863,7 @@
           hasTrace: !!match[1],
           id: match[2],
           name: cleanName,
-          appFlag: match[4],
+          tagID: match[4],
           r: parseInt(match[5]), g: parseInt(match[6]), b: parseInt(match[7]), a: parseInt(match[8]),
           role: role,
           originalIndex: index
@@ -553,12 +913,27 @@
       const container = document.getElementById('content');
       const filtered = getFilteredList();
       const sortType = document.getElementById('sortSelect').value;
+      // Get the sort direction (1 for Ascending, -1 for Descending)
+      const sortDir = document.getElementById('sortDir').value === 'asc' ? 1 : -1;
       
       // Apply Sorting
       filtered.sort((a, b) => {
-        if (sortType === 'name') return getFullExportName(a).localeCompare(getFullExportName(b));
-        if (sortType === 'color') return rgbToHsl(a.r, a.g, a.b).h - rgbToHsl(b.r, b.g, b.b).h;
-        return a.originalIndex - b.originalIndex;
+        let result = 0;
+
+        if (sortType === 'name') {
+          // Natural Sort: { numeric: true } handles the 1, 2, 10 sequence correctly
+          result = getFullExportName(a).localeCompare(getFullExportName(b), undefined, { 
+            numeric: true, 
+            sensitivity: 'base' 
+          });
+        } else if (sortType === 'color') {
+          result = rgbToHsl(a.r, a.g, a.b).h - rgbToHsl(b.r, b.g, b.b).h;
+        } else {
+          result = a.originalIndex - b.originalIndex;
+        }
+
+        // Multiply by direction to support ascending/descending
+        return result * sortDir;
       });
 
       lastFilteredColors = filtered;
@@ -575,7 +950,9 @@
       }
 
       const isGrouped = document.getElementById('pairedViewCheck').checked;
-      
+      const viewMode = document.querySelector('input[name="view-mode"]:checked')?.value || 'edit';
+      const cardGenerator = viewMode === 'preview' ? generatePreviewCardHTML : generateCardHTML;
+
       if (isGrouped) {
         const groups = filtered.reduce((acc, c) => {
           (acc[c.name] = acc[c.name] || []).push(c);
@@ -585,10 +962,10 @@
         container.innerHTML = `<div style="display:grid;gap:20px">${Object.entries(groups).map(([name, group]) => `
           <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:10px; border:1px solid var(--border-color)">
             <div style="margin-bottom:12px; font-family:var(--font-family-code); font-weight:bold; color:var(--accent-color); font-size:14px">${name}</div>
-            <div class="palette-grid">${group.map(c => generateCardHTML(c)).join('')}</div>
+            <div class="palette-grid">${group.map(c => cardGenerator(c)).join('')}</div>
           </div>`).join('')}</div>`;
       } else {
-        container.innerHTML = `<div class="palette-grid">${filtered.map(c => generateCardHTML(c)).join('')}</div>`;
+        container.innerHTML = `<div class="palette-grid">${filtered.map(c => cardGenerator(c)).join('')}</div>`;
       }
     }
 
@@ -608,11 +985,11 @@
           
           <div class="swatch-row">
             <input type="color" class="color-picker-input" value="${hex}" oninput="updateColor(${idx}, this.value)">
-            <div class="meta-inputs">
-              <label class="toggle-label"><input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="colors[${idx}].hasTrace=this.checked"> Autopaint</label>
-              <div class="alpha-row">
-                <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)">
-                <span class="version-tag" id="a-val-${idx}">${color.a}</span>
+              <div class="meta-inputs">
+                ${idx >= 2 ? `<label class="toggle-label"><input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="colors[${idx}].hasTrace=this.checked"> Autopaint</label>` : '<div style="height: 22px;"></div>'}
+                <div class="alpha-row">
+                  <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)">
+                  <span class="version-tag" id="a-val-${idx}" style="min-width: 20px; text-align: right; position: relative; top: 0px;">${color.a}</span>
               </div>
             </div>
           </div>
@@ -623,6 +1000,24 @@
               <label for="role-${r}-${idx}">${CONFIG.ROLES[r].label}</label>
             `).join('')}
           </div>
+        </div>`;
+    }
+
+    function generatePreviewCardHTML(color) {
+      const idx = colors.indexOf(color);
+      const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
+      const textColor = getContrastColor(color.r, color.g, color.b);
+      const roleCfg = CONFIG.ROLES[color.role];
+      
+      // Define the checkered pattern to match your CSS class
+      const checkeredPattern = `repeating-conic-gradient(#fff 0% 25%, #ccc 0% 50%)`;
+      
+      return `
+        <div class="color-card-preview" style="background-image: linear-gradient(${rgba}, ${rgba}), ${checkeredPattern}; background-size: auto, 20px 20px;">
+          <div class="preview-name" style="color: ${textColor};">${color.name}</div>
+          ${color.hasTrace && idx >= 2 ? '<div class="preview-badge bottom-left">A</div>' : ''}
+          <div class="preview-badge bottom-right">#${getShortId(color.id)}</div>
+          ${roleCfg.suffix ? `<div class="preview-badge top-right">${roleCfg.suffix}</div>` : ''}
         </div>`;
     }
 
@@ -655,15 +1050,15 @@
       const ids = colors.map(c => parseInt(getShortId(c.id))).filter(n => !isNaN(n));
       const nextId = (ids.length ? Math.max(...ids) : 0) + 1;
       
-      // Determine if there is a prefix (OpenToonz sometimes adds GUID-like prefixes)
+      // Determine prefix: prefer paletteData.prefix if available, otherwise fall back to existing id parsing
       const firstId = colors[0]?.id || "";
-      const prefix = firstId.includes('-') ? firstId.split('-')[0].replace(/"/g, '') + '-' : '';
+      const prefix = paletteData?.prefix ? paletteData.prefix + '-' : (firstId.includes('-') ? firstId.split('-')[0].replace(/"/g, '') + '-' : '');
       
       colors.push({
         hasTrace: false, 
         id: `"${prefix}${nextId}"`, 
         name: 'new_color',
-        appFlag: '0', 
+        tagID: '3', 
         r: 120, g: 120, b: 120, a: 255, 
         role: 'none',
         originalIndex: colors.length
@@ -681,10 +1076,11 @@
       const name = prompt("Enter a name for the new palette:", "new_palette");
       if (!name) return;
       
-      paletteData = { name, version: CONFIG.DEFAULT_TPL_VER, shortcuts: "" };
+      const prefix = generatePalettePrefix();
+      paletteData = { name, version: CONFIG.DEFAULT_TPL_VER, shortcuts: "0 1 -1 -1 -1 -1 -1 -1 -1 -1 ", prefix };
       colors = [
-        { hasTrace: false, id: '"0"', name: 'bg',  appFlag: '0', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
-        { hasTrace: false, id: '"1"', name: 'ink', appFlag: '0', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
+        { hasTrace: false, id: `"${prefix}-0"`, name: 'bg',  tagID: '3', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
+        { hasTrace: false, id: `"${prefix}-1"`, name: 'ink', tagID: '3', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
       ];
       
       ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
@@ -744,12 +1140,12 @@
 
     function exportPalette() {
       if (!paletteData) return;
-      let xml = `<palette name="${paletteData.name}">\n  <version>\n    ${paletteData.version}\n  </version>\n  <styles>\n`;
+      let xml = `<palette name="${paletteData.prefix || paletteData.name}">\n  <version>\n    ${paletteData.version}\n  </version>\n  <styles>\n`;
       colors.forEach(c => {
         const trace = c.hasTrace ? '_1 ' : '';
         let exportName = getFullExportName(c);
 
-        xml += `    <style>\n      ${trace}${c.id}${exportName} ${c.appFlag} ${c.r} ${c.g} ${c.b} ${c.a} \n    </style>\n`;
+        xml += `    <style>\n      ${trace}${c.id}${exportName} ${c.tagID} ${c.r} ${c.g} ${c.b} ${c.a} \n    </style>\n`;
       });
       xml += `  </styles>\n  <stylepages>\n    <page>\n      <name>\n        colors \n      </name>\n      <indices>\n        ${colors.map((_, i) => i).join(' ')} \n      </indices>\n    </page>\n  </stylepages>\n  <shortcuts>\n    ${paletteData.shortcuts}\n  </shortcuts>\n</palette>`;
       downloadFile(xml, `${paletteData.name}.tpl`, 'text/plain');
@@ -776,6 +1172,11 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    function generatePalettePrefix() {
+      // Unix timestamp + random suffix to approximate OpenToonz-style key (e.g. 1611507682_2814)
+      return `${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 90000) + 1000}`;
     }
   </script>
 </body>
