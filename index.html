@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPL Palette Manager</title>
+  <title>PltUI - Palette Manager</title>
 
+  <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
-
   <link rel="icon" type="image/png" sizes="192x192" href="images/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="images/android-chrome-512x512.png">
 
@@ -27,12 +26,13 @@
       --success-color: #98c379;
       --hue-filter-color: hsl(0, 100%, 50%);
 
-      --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.3), transparent);
-      --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.3), transparent);
-      --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.3), transparent);
+      /* Gradients for different roles */
+      --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.25), transparent);
+      --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.25), transparent);
+      --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.25), transparent);
 
       --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --border-radius-xs: 3px;
       --border-radius-sm: 4px;
       --border-radius-md: 6px;
@@ -43,62 +43,68 @@
       --font-size-lg: 14px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
       font-family: var(--font-family-sans);
       background: var(--bg-color);
       color: var(--text-color);
       line-height: 1.5;
-      min-height: 100vh;
+      overflow: hidden; /* Handled by app-wrapper */
     }
-    
+
+    /* Layout structure */
+    .app-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 20px;
+      padding: 10px 20px;
       background: var(--border-color);
+      flex-wrap: wrap;
+      gap: 12px;
+      z-index: 100;
     }
 
     h1 {
       display: flex;
       align-items: center;
-      gap: 12px; /* Space between logo and text */
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .header-logo {
-      height: 24px;
-      width: 24px;
-      object-fit: contain;
-      border-radius: var(--border-radius-xs);
-    }
-
-    .version-number {
-      font-family: var(--font-family-code);
-      font-size: 10px;
-      color: var(--sub-text);
-      margin-left: 8px;
-      font-weight: 400;
-      align-self: flex-end;
-      padding-bottom: 3px;
-      opacity: 0.7;
-    }
-    
-    .toolbar {
-      display: flex;
       gap: 10px;
+      font-size: 18px;
+      color: #fff;
+      user-select: none;
+    }
+
+    .header-logo { 
+      height: 24px; 
+      width: 24px; 
+      border-radius: var(--border-radius-xs); 
+      object-fit: contain;
+    }
+
+    .version-tag { 
+      font-family: var(--font-family-code); 
+      font-size: 11px; 
+      color: var(--sub-text); 
+      opacity: 0.6; 
+      font-weight: 400;
+      position: relative; top: 2px;
+    }
+
+    .toolbar { 
+      display: flex; 
+      gap: 8px; 
+      flex-wrap: wrap; 
     }
     
     button {
-      padding: 6px 16px;
+      padding: 6px 14px;
       background: var(--accent-color);
       color: white;
       border: none;
@@ -106,114 +112,67 @@
       cursor: pointer;
       font-size: var(--font-size-md);
       font-weight: 600;
-      transition: opacity 0.2s;
-    }
-    
-    button:hover {
-      opacity: 0.9;
-    }
-    
-    button:disabled {
-      background: #555;
-      color: #888;
-      cursor: not-allowed;
-    }
+      transition: all 0.2s;
+    }    
+    button:hover:not(:disabled) { opacity: 0.8; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; }
+    button.secondary { background: #4a4a4a; border: 1px solid #222; }
 
-    button.secondary {
-      background: #4a4a4a;
-      color: #fff;
-      border: 1px solid #222;
-    }
-
-    #fileInput {
-      display: none;
-    }
-    
+    /* Filter Bar Area */
     .filter-bar {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      padding: 15px 20px;
+      gap: 12px;
+      padding: 12px 20px;
       border-bottom: 1px solid var(--border-light-color);
       background: var(--input-bg-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: center;
-      width: 100%;
+    .filter-row { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 16px; 
+      align-items: center; 
     }
+    .filter-row { min-height: 38px; } /* Prevents layout shift from hue filter */
 
     .search-group {
       display: flex;
       flex-grow: 1;
       background: var(--input-bg-color);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border-light-color);
       border-radius: var(--border-radius-sm);
-      overflow: hidden;
       min-width: 250px;
+      transition: border-color 0.2s;
     }
+    .search-group:focus-within { border-color: var(--accent-color); }
 
     #searchInput {
-      flex-grow: 1;
+      flex: 1;
       padding: 8px 12px;
       background: transparent;
       border: none;
-      font-size: var(--font-size-lg);
       color: #fff;
       outline: none;
-    }
-    #searchInput::placeholder { color: #888; }
-
-    #searchInput::-webkit-search-cancel-button {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 16px;
-      width: 16px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e06c75'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-    }
-    #searchInput::-webkit-search-cancel-button:hover {
-      opacity: 1;
+      font-size: var(--font-size-lg);
     }
 
-    .search-options {
-      display: flex;
-      align-items: center;
-      padding: 0 4px;
-      gap: 4px;
-    }
-
+    .search-options { display: flex; align-items: center; padding-right: 4px; }
     .search-options label {
       display: grid;
       place-content: center;
       width: 28px;
       height: 28px;
       cursor: pointer;
-      border-radius: var(--border-radius-sm);
-      color: #aaa;
+      color: #777;
       font-family: var(--font-family-code);
-      font-size: var(--font-size-lg);
-      user-select: none;
-    }
-
-    .search-options input { display: none; }
-
-    .search-options input:checked + span {
-      background: var(--border-light-color);
-      color: #fff;
-    }
-    .search-options span {
-      display: grid;
-      place-content: center;
-      width: 100%;
-      height: 100%;
-      border-radius: var(--border-radius-sm);
-    }
+      font-weight: bold;
+      transition: color 0.2s;
+    }    
+    .search-options input[type="checkbox"] { display: none; }
+    .search-options input:checked + span { background: var(--border-light-color); color: #fff; border-radius: 4px; }    
+    .search-options span { display: grid; place-content: center; width: 24px; height: 24px; }
 
     .toggle-label {
       display: flex;
@@ -224,66 +183,38 @@
       cursor: pointer;
       user-select: none;
     }
+    .toggle-label:hover { color: #fff; }
 
-    .sort-options {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .sort-options { display: flex; align-items: center; gap: 8px; }
+    .sort-label {
+      font-size: var(--font-size-sm);
+      color: var(--sub-text);
+      user-select: none;
     }
-
     .sort-options select {
-      padding: 7px 10px;
-      background: var(--input-bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-sm);
-      color: #fff;
-      font-size: var(--font-size-lg);
-      outline: none;
+      padding: 8px 12px; background: var(--input-bg-color);
+      border: 1px solid var(--border-light-color); border-radius: var(--border-radius-sm);
+      color: #fff; font-size: var(--font-size-sm); outline: none; cursor: pointer;
     }
 
-    .sort-options .control-label {
-      font-weight: normal;
-      text-transform: none;
-      letter-spacing: normal;
-      color: var(--sub-text);
-      font-size: var(--font-size-sm);
-      cursor: pointer;
+    /* Content Area with custom scrollbar */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: var(--bg-color);
     }
+    #content::-webkit-scrollbar { width: 8px; }
+    #content::-webkit-scrollbar-track { background: var(--bg-color); }
+    #content::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    #content::-webkit-scrollbar-thumb:hover { background: #555; }
 
-    .hue-filter-group {
-      display: flex;
-      align-items: flex-end;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .hue-controls {
-      display: flex;
-      gap: 20px;
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .hue-controls .control-group {
-      min-width: 200px;
-    }
-
-    .hue-color-preview {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-      background-color: var(--hue-filter-color);
-      border: 1px solid var(--border-color);
-    }
-
-    .hue-controls span[id^="hue-"] {
-      font-size: var(--font-size-sm);
-      color: var(--sub-text);
-      width: 45px;
-      text-align: right;
-      font-family: var(--font-family-code);
-    }
-
+    /* Hue Filter UI */
+    .hue-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; padding: 4px 0; }
+    .hue-color-preview { width: 14px; height: 14px; border-radius: 2px; border: 1px solid #000; flex-shrink: 0; }
+    .hue-val-text { font-family: var(--font-family-code); font-size: 11px; color: var(--sub-text); width: 35px; }
+    
+    /* Grid layout */
     .palette-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -298,877 +229,517 @@
       display: flex;
       flex-direction: column;
       position: relative;
-    }
+      transition: transform 0.15s, box-shadow 0.15s;
+    }    
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 
-    .color-id-label {
+    .color-id-badge, .color-role-badge {
       font-family: var(--font-family-code);
-      font-size: var(--font-size-xs);
-      font-weight: 700;
-      padding: 5px 8px;
+      font-size: 11px;
+      padding: 4px 6px;
       background: var(--input-bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-xs);
+      border: 1px solid var(--border-light-color);
+      border-radius: 2px;
       color: var(--sub-text);
-      white-space: nowrap;
-    }
-
-    .color-role-label {
-      font-family: var(--font-family-code);
-      font-size: var(--font-size-xs);
-      font-weight: 700;
-      padding: 5px 8px;
-      background: var(--input-bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-xs);
-      color: var(--accent-color);
-      white-space: nowrap;
-      min-width: 45px;
-      text-align: center;
-    }
-
-    .delete-btn {
-      position: static;
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      padding: 0;
-      background: rgba(0,0,0,0.3);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 26px;
-      text-align: center;
-      font-weight: normal;
-      transition: all 0.2s;
-      opacity: 0.7;
-    }
-
-    .delete-btn:hover {
-      background: var(--primary-color);
-      opacity: 1;
-    }
-
-    .color-card.is-shadow { background-image: var(--shadow-grad); }
-    .color-card.is-highlight { background-image: var(--highlight-grad); }
-    .color-card.is-ao { background-image: var(--ao-grad); }
-    
-    .swatch-area {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-
-    .embedded-picker {
-      width: 50px;
-      height: 50px;
-      border: 1px solid #000;
-      cursor: pointer;
-      background: none;
-      padding: 0;
-      border-radius: var(--border-radius-sm);
-      flex-shrink: 0;
-    }
-
-    .meta-inputs {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      gap: 4px;
-      height: 50px; /* Match swatch height */
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 4px 8px;
-      background: var(--input-bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-xs);
-      font-size: var(--font-size-md);
-      color: #fff;
-    }
-
-    .color-name-input {
-      flex-grow: 1;
-      width: auto;
-    }
-
-    .trace-check {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: var(--font-size-xs);
-      cursor: pointer;
       user-select: none;
     }
+    .color-role-badge { color: var(--accent-color); min-width: 35px; text-align: center; }
 
-    .trace-check input[type="checkbox"],
-    .toggle-label input[type="checkbox"] {
+    .delete-btn {
+      width: 24px; height: 24px; border-radius: 50%; border: none;
+      background: rgba(0,0,0,0.2); color: #fff; cursor: pointer;
+      display: grid; place-content: center; font-size: 16px; padding: 0;
+      transition: background 0.2s;
+    }
+    .delete-btn:hover { background: var(--primary-color); }
+
+    /* Role Background States */
+    .color-card.is-shadow { background-image: var(--shadow-grad); border-color: rgba(102, 106, 209, 0.4); }
+    .color-card.is-highlight { background-image: var(--highlight-grad); border-color: rgba(231, 76, 60, 0.4); }
+    .color-card.is-ao { background-image: var(--ao-grad); border-color: rgba(152, 195, 121, 0.4); }
+    
+    .swatch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .color-picker-input { 
+      width: 48px; height: 48px; border: 1px solid #000; 
+      cursor: pointer; border-radius: 4px; background: none; padding: 0;
+    }
+    .meta-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+    .text-input {
+      width: 100%; padding: 6px 10px; background: var(--input-bg-color);
+      border: 1px solid var(--border-light-color); border-radius: 4px; color: #fff;
+      font-size: var(--font-size-md);
+    }
+    .text-input:focus { border-color: var(--accent-color); outline: none; }
+
+    .alpha-row { display: flex; align-items: center; gap: 10px; }
+    .alpha-slider { flex: 1; accent-color: var(--accent-color); height: 4px; cursor: pointer; }
+
+    /* Custom Radio Styling for Roles */
+    .role-selector { display: flex; background: var(--input-bg-color); padding: 2px; border-radius: 6px; border: 1px solid var(--border-light-color); }
+    .role-selector label { flex: 1; text-align: center; font-size: 10px; padding: 5px; cursor: pointer; color: #777; font-weight: bold; letter-spacing: 0.05em; }
+    .role-selector input { display: none; }
+    .role-selector input:checked + label { background: var(--card-bg); color: #fff; border-radius: 4px; }
+
+    .app-footer {
+      flex-shrink: 0; background: var(--border-color); border-top: 1px solid var(--border-light-color);
+      padding: 10px 20px; text-align: center; color: var(--sub-text); font-size: 11px;
+    }
+    .app-footer a { color: var(--sub-text); text-decoration: none; }
+    .app-footer a:hover { text-decoration: underline; }
+
+    .empty-state {
+      text-align: center; padding: 80px 40px; color: #555; border: 2px dashed var(--border-light-color); border-radius: 12px;
+      margin: 0;
+    }
+
+    /* Checkbox appearance */
+    input[type="checkbox"] {
       -webkit-appearance: none;
       appearance: none;
       background-color: var(--input-bg-color);
-      margin: 0;
-      font: inherit;
-      color: currentColor;
-      width: 16px;
-      height: 16px;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border-light-color);
+      width: 15px; height: 15px;
       border-radius: var(--border-radius-xs);
-      transform: translateY(-0.075em);
       display: grid;
       place-content: center;
       cursor: pointer;
+      position: relative;
     }
-
-    .trace-check input[type="checkbox"]::before,
-    .toggle-label input[type="checkbox"]::before {
+    input[type="checkbox"]::before {
       content: "";
-      width: 0.65em;
-      height: 0.65em;
+      width: 0.75em;
+      height: 0.75em;
       transform: scale(0);
       transition: 120ms transform ease-in-out;
       box-shadow: inset 1em 1em white;
-      transform-origin: bottom left;
       clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
     }
+    input[type="checkbox"]:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
+    input[type="checkbox"]:checked::before { transform: scale(1); }
 
-    .trace-check input[type="checkbox"]:checked::before,
-    .toggle-label input[type="checkbox"]:checked::before {
-      transform: scale(1.2);
-    }
-
-    .card-controls {
-      padding-top: 10px;
-      border-top: 1px solid var(--border-light-color);
-    }
-
-    .control-group {
-      display: flex;
-      align-items: center;      
-      gap: 8px;
-    }
-
-    .control-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .meta-inputs .control-label {
-      font-size: var(--font-size-xs);
-      color: var(--sub-text);
-      font-weight: normal;
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    .alpha-value {
-      font-size: 10px;
-      color: #888;
-      width: 25px;
-      text-align: right;
-      font-family: var(--font-family-code);
-    }
-
-    .alpha-slider {
-      flex: 1;
-      height: 4px;
-      cursor: pointer;
-      accent-color: var(--accent-color);
-      min-width: 50px;
-    }
-
-    .radio-group {
-      display: flex;
-      background: var(--input-bg-color);
-      padding: 2px;
-      border-radius: var(--border-radius-sm);
-    }
-
-    .radio-group label {
-      flex: 1;
-      text-align: center;
-      font-size: 10px;
-      padding: 4px 0;
-      cursor: pointer;
-      border-radius: 2px;
-      color: #888;
-    }
-
-    .radio-group input { display: none; }
-
-    .radio-group input:checked + label {
-      background: var(--border-light-color);
-      color: #fff;
-    }
-
-    .app-wrapper {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #content {
-      flex: 1; /* Push footer to bottom */
-      overflow-y: auto;
-      padding: 20px;
-      background: var(--bg-color);
-    }
-
-    .app-footer {
-      flex-shrink: 0;
-      background: var(--border-color);
-      border-top: 1px solid var(--border-light-color);
-      padding: 10px 20px;
-      text-align: center;
-      z-index: 10;
-    }
-
-    .footer-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      font-size: var(--font-size-sm);
-      color: var(--sub-text);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 100px 20px;
-      color: #888;
-      border: 2px dashed var(--border-light-color);
-      border-radius: var(--border-radius-lg);
-      font-size: var(--font-size-lg);
-    }
-
-    .palette-pair-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .pair-group {
-      background: rgba(0,0,0,0.1);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-md);
-      padding: 12px;
-    }
-
-    .pair-header {
-      font-family: var(--font-family-code);
-      color: var(--sub-text);
-      margin-bottom: 12px;
-      font-size: var(--font-size-lg);
-    }
-
-    .pair-colors {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
+    /* Mobile Breakpoints */
+    @media (max-width: 650px) {
+      header { justify-content: center; }
+      .toolbar { width: 100%; justify-content: center; }
+      .filter-row { flex-direction: column; align-items: stretch; gap: 10px; }
+      .search-group { width: 100%; min-width: 100%; }
+      .hue-controls { justify-content: center; }
     }
   </style>
 </head>
 <body>
 
   <div class="app-wrapper">
-    <header>
-      <h1>
-        <img src="images/favicon-48.png" alt="Logo" class="header-logo">
-        PltUI
-        <span class="version-number">v1.0.0</span>
-      </h1>
-      <div class="toolbar">
-        <button class="secondary" onclick="newPalette()">New Palette</button>
-        <button class="secondary" onclick="document.getElementById('fileInput').click()">Import File</button>
-        <button onclick="addColor()" id="addBtn" disabled>New Color</button>
-        <button onclick="exportPalette()" id="exportBtn" disabled>Export TPL</button>
-        <button onclick="exportJson()" id="exportJsonBtn" class="secondary" disabled>Export JSON</button>
-        <input type="file" id="fileInput" accept=".tpl,.xml,.txt" onchange="loadFile(event)">
-      </div>
-    </header>
+    <header id="main-header"></header>
     
     <div class="filter-bar">
+      <!-- Search and View Row -->
       <div class="filter-row">
         <div class="search-group">
-          <input type="search" id="searchInput" placeholder="Filter by name (e.g., body_*)" oninput="renderPalette()">
+          <input type="search" id="searchInput" placeholder="Search by name or suffix (e.g., hair / *_sh)" oninput="renderPalette()">
           <div class="search-options">
-            <label title="Match Case">
-              <input type="checkbox" id="matchCaseCheck" onchange="renderPalette()"><span>Aa</span>
-            </label>
-            <label title="Match Whole Word">
-              <input type="checkbox" id="matchWholeWordCheck" onchange="renderPalette()"><span>""</span>
-            </label>
+            <label title="Match Case"><input type="checkbox" id="matchCaseCheck" onchange="renderPalette()"><span>Aa</span></label>
+            <label title="Match Whole Word"><input type="checkbox" id="matchWholeWordCheck" onchange="renderPalette()"><span>""</span></label>
           </div>
         </div>
-        <div class="view-options">
-          <label class="toggle-label"><input type="checkbox" id="pairedViewCheck" onchange="renderPalette()"> Group By Name</label>
-        </div>
+
         <div class="sort-options">
-          <label for="sortSelect" class="control-label">Sort By</label>
+          <label for="sortSelect" class="sort-label">Order:</label>
           <select id="sortSelect" onchange="renderPalette()">
-            <option value="default">File Order</option>
+            <option value="default">ID</option>
             <option value="name">Name</option>
             <option value="color">Color</option>
           </select>
         </div>
       </div>
-      <div class="filter-row">
-        <div id="id-copier" style="display: none;">
-          <button onclick="copyIdsToClipboard()">Copy Visible IDs</button>
-        </div>
-        <div class="hue-filter-group">
+
+      <!-- Actions and Hue Row -->
+      <div class="filter-row" style="align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span class="sort-label">Group By:</span>
           <label class="toggle-label">
-            <input type="checkbox" id="hueFilterCheck" onchange="toggleHueControls()"> Filter by Hue
+            <input type="checkbox" id="pairedViewCheck" onchange="renderPalette()"> 
+            Name
           </label>
-          <div class="hue-controls" style="display: none;">
-            <div class="control-group">
-              <span class="control-label">HUE</span>
-              <span class="hue-color-preview"></span>
-              <input type="range" class="alpha-slider" id="hueSlider" min="0" max="360" value="0" oninput="updateHueUI()">
-              <span id="hue-val">0°</span>
-            </div>
-            <div class="control-group">
-              <span class="control-label">RANGE</span>
-              <input type="range" class="alpha-slider" id="hueThresholdSlider" min="0" max="180" value="10" oninput="updateHueUI()">
-              <span id="hue-threshold-val">±10°</span>
+          <span style="color: var(--border-light-color); user-select: none;">|</span>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <label class="toggle-label"><input type="checkbox" id="hueFilterCheck" onchange="toggleHueControls()"> Hue</label>
+            <div class="hue-controls" style="display: none;">
+              <div class="hue-color-preview" id="huePreview"></div>
+              <input type="range" class="alpha-slider" id="hueSlider" min="0" max="360" value="0" style="width:100px" oninput="updateHueUI()">
+              <span id="hue-val" class="hue-val-text">0°</span>
+              <input type="range" class="alpha-slider" id="hueThresholdSlider" min="0" max="180" value="15" style="width:80px" oninput="updateHueUI()">
+              <span id="hue-threshold-val" class="hue-val-text">±15°</span>
             </div>
           </div>
+        </div>
+
+        <div id="id-copier-container" style="display: none; gap: 8px; margin-left: auto;">
+          <button class="secondary" onclick="addColor()" id="addBtn" disabled>New Colour</button>
+          <button class="secondary" onclick="copyIdsToClipboard()">Copy Visible IDs</button>
         </div>
       </div>
     </div>
 
     <div id="content">
       <div class="empty-state">
-        Import a palette file to begin editing
+        <h2 style="margin-bottom:10px; color:var(--sub-text)">No Palette Loaded</h2>
+        <p>Create or import a <strong>.tpl</strong> file to start editing.</p>
       </div>
     </div>
 
-    <footer class="app-footer">
-      <div class="footer-content">
-        <span>Created by <strong>KONERO</strong></span>
-      </div>
-    </div>
+    <footer class="app-footer" id="main-footer"></footer>
   </div>
 
   <script>
+    /**
+     * CENTRAL CONFIGURATION
+     */
+    const CONFIG = {
+      APP_NAME: "PltUI",
+      VERSION: "v1.0.1",
+      AUTHOR: "KONERO",
+      DEFAULT_TPL_VER: "71 0",
+      ROLES: {
+        none:      { suffix: '',    label: 'BASE',   cssClass: '' },
+        shadow:    { suffix: '_sh', label: 'SHADOW', cssClass: 'is-shadow' },
+        highlight: { suffix: '_hl', label: 'LIGHT', cssClass: 'is-highlight' },
+        ao:        { suffix: '_ao', label: 'AO',     cssClass: 'is-ao' }
+      }
+    };
+
     let paletteData = null;
     let colors = [];
     let lastFilteredColors = [];
 
-    function loadFile(event) {
+    // Setup Dynamic UI Elements
+    window.addEventListener('DOMContentLoaded', () => {
+      // Header
+      document.getElementById('main-header').innerHTML = `
+        <h1>
+          <img src="images/favicon-48.png" alt="" class="header-logo" onerror="this.style.display='none'">
+          ${CONFIG.APP_NAME} <span class="version-tag">${CONFIG.VERSION}</span>
+        </h1>
+        <div class="toolbar">
+          <button class="secondary" onclick="newPalette()">New TPL</button>
+          <button class="secondary" onclick="document.getElementById('fileInput').click()">Load TPL</button>
+          <button class="secondary" onclick="exportPalette()" id="exportBtn" disabled>Export TPL</button>
+          <button class="secondary" onclick="exportJson()" id="exportJsonBtn" class="secondary" disabled>Export JSON</button>
+          <input type="file" id="fileInput" style="display:none" accept=".tpl,.xml,.txt" onchange="handleFile(event)">
+        </div>`;
+      
+      // Footer
+      document.getElementById('main-footer').innerHTML = `
+        <span>Created by <strong>${CONFIG.AUTHOR}</strong></span>
+        <span style="margin: 0 10px; opacity:0.3">|</span>
+        <span><a href="https://github.com/konero/PltUI" target="_blank">Contribute</a></span>
+        <span style="margin: 0 10px; opacity:0.3">|</span>
+        <span><a href="">Offline</a></span>
+        <span style="margin: 0 10px; opacity:0.3">|</span>
+        <span><a href="">Help</a></span>`;
+
+      // Set initial hue preview color
+      const h = document.getElementById('hueSlider').value;
+      document.getElementById('huePreview').style.backgroundColor = `hsl(${h}, 100%, 50%)`;
+    });
+
+    /**
+     * HELPERS
+     */
+    const getFullExportName = (color) => color.name + (CONFIG.ROLES[color.role]?.suffix || '');
+
+    const getShortId = (fullId) => {
+      const clean = fullId.replace(/"/g, '');
+      const parts = clean.split('-');
+      return parts[parts.length - 1];
+    };
+
+    function handleFile(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-      reader.onload = function(e) {
-        parsePalette(e.target.result);
-      };
+      reader.onload = e => parseTPL(e.target.result);
       reader.readAsText(file);
-      event.target.value = '';
+      event.target.value = ''; // Reset input
     }
 
-    function parsePalette(xmlString) {
+    function parseTPL(xmlString) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlString, "text/xml");
       const paletteNode = xmlDoc.querySelector('palette');
-      
-      if (!paletteNode) {
-        alert("Invalid file format.");
-        return;
-      }
+      if (!paletteNode) return alert("Error: Could not find <palette> node. Is this a valid TPL file?");
 
       paletteData = {
-        name: paletteNode.getAttribute('name'),
-        version: xmlDoc.querySelector('version')?.textContent.trim() || "71 0",
+        name: paletteNode.getAttribute('name') || "new_palette",
+        version: xmlDoc.querySelector('version')?.textContent.trim() || CONFIG.DEFAULT_TPL_VER,
         shortcuts: xmlDoc.querySelector('shortcuts')?.textContent.trim() || ""
       };
 
       colors = [];
       const styles = xmlDoc.querySelectorAll('style');
-      const regex = /^\s*(_1\s+)?("[^"]+")([^\s]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
+      // TPL Regex: matches trace, ID, name, appFlag, R, G, B, A
+      const styleRegex = /^\s*(_1\s+)?("[^"]+")([^\s]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
 
       styles.forEach((style, index) => {
-        const match = style.textContent.trim().match(regex);
-        if (match) {
-          let rawName = match[3];
-          let role = 'none';
-          let cleanName = rawName;
+        const match = style.textContent.trim().match(styleRegex);
+        if (!match) return;
 
-          if (rawName.endsWith('_sh')) {
-            role = 'shadow';
-            cleanName = rawName.slice(0, -3);
-          } else if (rawName.endsWith('_hl')) {
-            role = 'highlight';
-            cleanName = rawName.slice(0, -3);
-          } else if (rawName.endsWith('_ao')) {
-            role = 'ao';
-            cleanName = rawName.slice(0, -3);
+        const rawName = match[3];
+        let role = 'none';
+        let cleanName = rawName;
+
+        // Determine role from suffix
+        for (const [key, val] of Object.entries(CONFIG.ROLES)) {
+          if (val.suffix && rawName.endsWith(val.suffix)) {
+            role = key;
+            cleanName = rawName.slice(0, -val.suffix.length);
+            break;
           }
-
-          colors.push({
-            hasTrace: !!match[1],
-            id: match[2],
-            name: cleanName,
-            appFlag: match[4],
-            r: parseInt(match[5]),
-            g: parseInt(match[6]),
-            b: parseInt(match[7]),
-            a: parseInt(match[8]),
-            role: role,
-            originalIndex: index
-          });
         }
+
+        colors.push({
+          hasTrace: !!match[1],
+          id: match[2],
+          name: cleanName,
+          appFlag: match[4],
+          r: parseInt(match[5]), g: parseInt(match[6]), b: parseInt(match[7]), a: parseInt(match[8]),
+          role: role,
+          originalIndex: index
+        });
       });
 
-      // Reset filters when a new file is loaded
-      resetUIState();
-
+      // Enable UI
+      ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
       renderPalette();
-      document.getElementById('exportBtn').disabled = false;
-      document.getElementById('addBtn').disabled = false;
-      document.getElementById('exportJsonBtn').disabled = false;
     }
 
-    function renderPalette() {
-      const content = document.getElementById('content');
-      const isPairedView = document.getElementById('pairedViewCheck').checked;
-      const idCopier = document.getElementById('id-copier');
-
-      if (colors.length === 0) {
-        content.innerHTML = '<div class="empty-state">Import a palette file to begin editing</div>';
-        idCopier.style.display = 'none';
-        return;
-      }
-
-      // If a file is loaded, the "Copy IDs" button area should always be visible to prevent layout shifts.
-      idCopier.style.display = 'block';
-
-      const filteredColors = getFilteredColors();
-      const sortedAndFilteredColors = sortColors(filteredColors);
-      lastFilteredColors = sortedAndFilteredColors;
-
-      if (sortedAndFilteredColors.length === 0) {
-        content.innerHTML = '<div class="empty-state">No colors match your filter</div>';
-        return;
-      }
-
-      if (isPairedView) {
-        renderPairedView(sortedAndFilteredColors);
-      } else {
-        renderGridView(sortedAndFilteredColors);
-      }
-    }
-
-    function getFilteredColors() {
-      const searchTerm = document.getElementById('searchInput').value;
+    /**
+     * FILTERING LOGIC
+     */
+    function getFilteredList() {
+      const term = document.getElementById('searchInput').value;
       const matchCase = document.getElementById('matchCaseCheck').checked;
-      const matchWholeWord = document.getElementById('matchWholeWordCheck').checked;
+      const matchWhole = document.getElementById('matchWholeWordCheck').checked;
+      const hueOn = document.getElementById('hueFilterCheck').checked;
       
-      let filteredColors = [...colors];
+      let results = [...colors];
 
-      // Name filter
-      if (searchTerm) {
-        // Smart search: convert glob-like '*' to '.*' for regex
-        const pattern = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*');
-        const regex = new RegExp(matchWholeWord ? `^${pattern}$` : pattern, matchCase ? '' : 'i');
-        filteredColors = filteredColors.filter(c => {
-          let fullName = c.name;
-          if (c.role === 'shadow') fullName += '_sh';
-          else if (c.role === 'highlight') fullName += '_hl';
-          else if (c.role === 'ao') fullName += '_ao';
-          return regex.test(fullName);
-        });
+      if (term) {
+        // Convert * to wildcard regex
+        const pattern = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*');
+        const regex = new RegExp(matchWhole ? `^${pattern}$` : pattern, matchCase ? '' : 'i');
+        results = results.filter(c => regex.test(getFullExportName(c)));
       }
 
-      // Hue filter
-      const hueFilterEnabled = document.getElementById('hueFilterCheck').checked;
-      if (hueFilterEnabled) {
+      if (hueOn) {
         const targetHue = parseInt(document.getElementById('hueSlider').value);
         const threshold = parseInt(document.getElementById('hueThresholdSlider').value);
-
-        filteredColors = filteredColors.filter(c => {
-            const colorHsl = rgbToHsl(c.r, c.g, c.b);
-            // Only match colors with some saturation. Greys are hard to place by hue...
-            if (colorHsl.s < 0.1) return false; 
-            
-            const diff = Math.abs(colorHsl.h - targetHue);
-            const dist = Math.min(diff, 360 - diff);
-            return dist <= threshold;
+        results = results.filter(c => {
+          const hsl = rgbToHsl(c.r, c.g, c.b);
+          if (hsl.s < 0.1) return false; // Ignore desaturated colors
+          const diff = Math.abs(hsl.h - targetHue);
+          return Math.min(diff, 360 - diff) <= threshold;
         });
       }
-
-      return filteredColors;
+      return results;
     }
 
-    function sortColors(colorsToSort) {
+    /**
+     * RENDERING
+     */
+    function renderPalette() {
+      const container = document.getElementById('content');
+      const filtered = getFilteredList();
       const sortType = document.getElementById('sortSelect').value;
       
-      switch (sortType) {
-        case 'name':
-          return [...colorsToSort].sort((a, b) => {
-            let fullNameA = a.name + (a.role === 'shadow' ? '_sh' : a.role === 'highlight' ? '_hl' : '');
-            let fullNameB = b.name + (b.role === 'shadow' ? '_sh' : b.role === 'highlight' ? '_hl' : '');
-            return fullNameA.localeCompare(fullNameB);
-          });
-        case 'color':
-          return [...colorsToSort].sort((a, b) => {
-            const hslA = rgbToHsl(a.r, a.g, a.b);
-            const hslB = rgbToHsl(b.r, b.g, b.b);
-            // Group greys at the end
-            if (hslA.s < 0.1 && hslB.s > 0.1) return 1;
-            if (hslB.s < 0.1 && hslA.s > 0.1) return -1;
-            // Sort by hue, then saturation, then lightness
-            if (hslA.h !== hslB.h) return hslA.h - hslB.h;
-            if (hslA.s !== hslB.s) return hslB.s - hslA.s; // higher saturation first
-            return hslB.l - hslA.l; // higher lightness first
-          });
-        case 'default':
-        default:
-          // Sort by original index in the main `colors` array to restore file order
-          return [...colorsToSort].sort((a, b) => a.originalIndex - b.originalIndex);
+      // Apply Sorting
+      filtered.sort((a, b) => {
+        if (sortType === 'name') return getFullExportName(a).localeCompare(getFullExportName(b));
+        if (sortType === 'color') return rgbToHsl(a.r, a.g, a.b).h - rgbToHsl(b.r, b.g, b.b).h;
+        return a.originalIndex - b.originalIndex;
+      });
+
+      lastFilteredColors = filtered;
+      document.getElementById('id-copier-container').style.display = colors.length ? 'flex' : 'none';
+
+      if (!colors.length) {
+        container.innerHTML = `<div class="empty-state">Import a file to begin</div>`;
+        return;
+      }
+      
+      if (!filtered.length) {
+        container.innerHTML = `<div class="empty-state">No colors match your current filters.</div>`;
+        return;
+      }
+
+      const isGrouped = document.getElementById('pairedViewCheck').checked;
+      
+      if (isGrouped) {
+        const groups = filtered.reduce((acc, c) => {
+          (acc[c.name] = acc[c.name] || []).push(c);
+          return acc;
+        }, {});
+        
+        container.innerHTML = `<div style="display:grid;gap:20px">${Object.entries(groups).map(([name, group]) => `
+          <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:10px; border:1px solid var(--border-color)">
+            <div style="margin-bottom:12px; font-family:var(--font-family-code); font-weight:bold; color:var(--accent-color); font-size:14px">${name}</div>
+            <div class="palette-grid">${group.map(c => generateCardHTML(c)).join('')}</div>
+          </div>`).join('')}</div>`;
+      } else {
+        container.innerHTML = `<div class="palette-grid">${filtered.map(c => generateCardHTML(c)).join('')}</div>`;
       }
     }
 
-    function toggleHueControls() {
-      const isChecked = document.getElementById('hueFilterCheck').checked;
-      document.querySelector('.hue-controls').style.display = isChecked ? 'flex' : 'none';
-      renderPalette();
-    }
-
-    function resetUIState() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('matchCaseCheck').checked = false;
-      document.getElementById('matchWholeWordCheck').checked = false;
-      document.getElementById('pairedViewCheck').checked = false;
-      document.getElementById('sortSelect').value = 'default';
-      document.getElementById('hueFilterCheck').checked = false;
-      document.querySelector('.hue-controls').style.display = 'none';
-      document.getElementById('hueSlider').value = 0;
-      document.getElementById('hueThresholdSlider').value = 10;
-      updateHueUIDisplayOnly();
-    }
-
-    function updateHueUIDisplayOnly() {
-      const hue = document.getElementById('hueSlider').value;
-      const threshold = document.getElementById('hueThresholdSlider').value;
-      document.getElementById('hue-val').textContent = `${hue}°`;
-      document.getElementById('hue-threshold-val').textContent = `±${threshold}°`;
-      document.documentElement.style.setProperty('--hue-filter-color', `hsl(${hue}, 100%, 50%)`);
-    }
-
-    function updateHueUI() {
-      updateHueUIDisplayOnly();
-      renderPalette();
-    }
-
-    function renderGridView(filteredColors) {
-      const content = document.getElementById('content');
-      let html = '<div class="palette-grid">';
-      filteredColors.forEach(color => {
-        const originalIndex = colors.findIndex(c => c === color);
-        html += generateColorCardHTML(color, originalIndex);
-      });
-      html += '</div>';
-      content.innerHTML = html;
-    }
-
-    function renderPairedView(filteredColors) {
-      const content = document.getElementById('content');
-      const groups = {};
-
-      // Group by base name
-      filteredColors.forEach(color => {
-        if (!groups[color.name]) {
-          groups[color.name] = [];
-        }
-        groups[color.name].push(color);
-      });
-
-      let html = '<div class="palette-pair-grid">';
-      for (const name in groups) {
-        html += `<div class="pair-group">`;
-        html += `<div class="pair-header">${name}</div>`;
-        html += `<div class="pair-colors">`;
-        groups[name].forEach(color => {
-          const originalIndex = colors.findIndex(c => c === color);
-          html += generateColorCardHTML(color, originalIndex);
-        });
-        html += `</div></div>`;
-      }
-      html += '</div>';
-      content.innerHTML = html;
-    }
-
-    function generateColorCardHTML(color, idx) {
-      const hex = rgbToHex(color.r, color.g, color.b);
-      const cardClass = color.role !== 'none' ? `is-${color.role}` : '';
-      const idString = color.id.slice(1, -1);
-      const parts = idString.split('-');
-      const displayId = parts[parts.length - 1];
-      const roleLabel = {
-        'shadow': '_sh',
-        'highlight': '_hl',
-        'ao': '_ao',
-        'none': '&nbsp;'
-      }[color.role];
-
+    function generateCardHTML(color) {
+      const idx = colors.indexOf(color);
+      const hex = "#" + [color.r, color.g, color.b].map(x => x.toString(16).padStart(2, '0')).join('');
+      const roleCfg = CONFIG.ROLES[color.role];
+      
       return `
-        <div class="color-card ${cardClass}" id="card-${idx}">
+        <div class="color-card ${roleCfg.cssClass}" id="card-${idx}">
           <div class="card-header">
-            <span class="color-id-label" title="Full ID: ${idString}">#${displayId}</span>
-            <input type="text" class="color-name-input" value="${color.name}" oninput="updateName(${idx}, this.value)" placeholder="Color Name">
-            <span class="color-role-label">${roleLabel}</span>
-            ${idx >= 2 ? `<button class="delete-btn" title="Delete color" onclick="deleteColor(${idx})">&times;</button>` : '<div style="width: 28px; flex-shrink: 0;"></div>'}
+            <span class="color-id-badge" title="TPL internal ID">#${getShortId(color.id)}</span>
+            <input type="text" class="text-input" value="${color.name}" oninput="colors[${idx}].name=this.value" placeholder="Name">
+            <span class="color-role-badge">${roleCfg.suffix || '&nbsp;'}</span>
+            ${idx >= 2 ? `<button class="delete-btn" title="Delete" onclick="deleteColor(${idx})">&times;</button>` : '<div style="width:24px"></div>'}
           </div>
-          <div class="swatch-area">
-            <input type="color" class="embedded-picker" value="${hex}" oninput="updateColor(${idx}, this.value)">
+          
+          <div class="swatch-row">
+            <input type="color" class="color-picker-input" value="${hex}" oninput="updateColor(${idx}, this.value)">
             <div class="meta-inputs">
-              <label class="trace-check toggle-label">
-                <input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="updateTrace(${idx}, this.checked)"> Trace Flag
-              </label>
-              <div class="control-group">
-                <span class="control-label">Alpha</span>
+              <label class="toggle-label"><input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="colors[${idx}].hasTrace=this.checked"> Autopaint</label>
+              <div class="alpha-row">
                 <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)">
-                <span id="alpha-val-${idx}" class="alpha-value">${color.a}</span>
+                <span class="version-tag" id="a-val-${idx}">${color.a}</span>
               </div>
             </div>
           </div>
-          <div class="card-controls">
-            <div class="radio-group">
-              <input type="radio" name="role-${idx}" id="r-none-${idx}" value="none" ${color.role === 'none' ? 'checked' : ''} onchange="updateRole(${idx}, 'none')"><label for="r-none-${idx}">Normal</label>
-              <input type="radio" name="role-${idx}" id="r-shd-${idx}" value="shadow" ${color.role === 'shadow' ? 'checked' : ''} onchange="updateRole(${idx}, 'shadow')"><label for="r-shd-${idx}">Shadow</label>
-              <input type="radio" name="role-${idx}" id="r-hgh-${idx}" value="highlight" ${color.role === 'highlight' ? 'checked' : ''} onchange="updateRole(${idx}, 'highlight')"><label for="r-hgh-${idx}">Highlight</label>
-              <input type="radio" name="role-${idx}" id="r-ao-${idx}" value="ao" ${color.role === 'ao' ? 'checked' : ''} onchange="updateRole(${idx}, 'ao')"><label for="r-ao-${idx}">AO</label>
-            </div>
+          
+          <div class="role-selector">
+            ${Object.keys(CONFIG.ROLES).map(r => `
+              <input type="radio" name="role-grp-${idx}" id="role-${r}-${idx}" ${color.role === r ? 'checked' : ''} onchange="updateRole(${idx},'${r}')">
+              <label for="role-${r}-${idx}">${CONFIG.ROLES[r].label}</label>
+            `).join('')}
           </div>
         </div>`;
     }
 
-    function newPalette() {
-      const paletteName = prompt("Enter a name for the new palette:", "new_palette");
-      if (!paletteName) {
-        return; // User cancelled
-      }
-
-      paletteData = {
-        name: paletteName,
-        version: "71 0",
-        shortcuts: ""
-      };
-
-      colors = [
-        // Color 0: Transparent BG. Cannot be deleted.
-        {
-          hasTrace: false,
-          id: '"0"',
-          name: 'color_0',
-          appFlag: '0',
-          r: 255, g: 255, b: 255, a: 0,
-          role: 'none',
-          originalIndex: 0
-        },
-        // Color 1: Default Ink. Cannot be deleted.
-        {
-          hasTrace: false,
-          id: '"1"',
-          name: 'color_1',
-          appFlag: '0',
-          r: 0, g: 0, b: 0, a: 255,
-          role: 'none',
-          originalIndex: 1
-        }
-      ];
-
-      // Reset UI state
-      resetUIState();
-
-      renderPalette();
-      document.getElementById('exportBtn').disabled = false;
-      document.getElementById('addBtn').disabled = false;
-      document.getElementById('exportJsonBtn').disabled = false;
-    }
-
-    function addColor() {
-      if (!paletteData) return;
-
-      // Find the highest existing ID to generate a new one. The ID can be a simple
-      // number `"12"` or a complex string `"|-...-12"`. We need to robustly
-      // extract the numeric part at the end to find the true max ID.
-      const numericIds = colors.map(c => {
-        const idString = c.id.slice(1, -1); // remove quotes
-        const parts = idString.split('-');
-        return parseInt(parts[parts.length - 1], 10);
-      }).filter(id => !isNaN(id)); // Filter out any parsing failures
-
-      const maxId = numericIds.length > 0 ? Math.max(...numericIds) : -1;
-      const newNumericId = maxId + 1;
-
-      // Now, construct the new full ID string, preserving any prefix from the original IDs.
-      let newIdString;
-      if (colors.length > 0) {
-        const firstId = colors[0].id.slice(1, -1);
-        const lastDashIndex = firstId.lastIndexOf('-');
-
-        if (lastDashIndex !== -1) {
-          // Complex ID with prefix found, e.g., "|-1611507682_28145-0"
-          const prefix = firstId.substring(0, lastDashIndex + 1);
-          newIdString = `${prefix}${newNumericId}`;
-        } else {
-          // Simple numeric ID, e.g., "0"
-          newIdString = `${newNumericId}`;
-        }
-      } else {
-        // This case shouldn't happen if addColor is only enabled after loading a file,
-        // but as a fallback, we'll create a simple numeric ID.
-        newIdString = `${newNumericId}`;
-      }
-
-      const newColor = {
-        hasTrace: false,
-        id: `"${newIdString}"`,
-        name: 'new_color',
-        appFlag: '0', // Default appFlag
-        r: 0, g: 0, b: 0, // Default to black
-        a: 255, // Default to opaque
-        role: 'none',
-        originalIndex: colors.length
-      };
-
-      colors.push(newColor);
-      renderPalette();
-    }
-
-    function deleteColor(idx) {
-      // Per OpenToonz format, the first two colors (indices 0 and 1) are special
-      // and should not be deleted. They are required for transparency and default lines.
-      if (idx < 2) {
-        alert("The first two colors are required by OpenToonz and cannot be deleted.");
-        return;
-      }
-      colors.splice(idx, 1);
-      renderPalette();
-    }
-
+    /**
+     * DATA UPDATES
+     */
     function updateColor(idx, hex) {
-      colors[idx].r = parseInt(hex.substr(1, 2), 16);
-      colors[idx].g = parseInt(hex.substr(3, 2), 16);
-      colors[idx].b = parseInt(hex.substr(5, 2), 16);
+      colors[idx].r = parseInt(hex.slice(1, 3), 16);
+      colors[idx].g = parseInt(hex.slice(3, 5), 16);
+      colors[idx].b = parseInt(hex.slice(5, 7), 16);
     }
 
     function updateAlpha(idx, val) {
       colors[idx].a = parseInt(val);
-      document.getElementById(`alpha-val-${idx}`).textContent = val;
+      document.getElementById(`a-val-${idx}`).textContent = val;
     }
 
-    function updateName(idx, val) { colors[idx].name = val; }
-    function updateTrace(idx, val) { colors[idx].hasTrace = val; }
-    
     function updateRole(idx, role) {
       colors[idx].role = role;
-      const card = document.getElementById(`card-${idx}`);
-      card.classList.remove('is-shadow', 'is-highlight', 'is-ao');
-      if (role !== 'none') card.classList.add(`is-${role}`);
-
-      const roleLabelEl = card.querySelector('.color-role-label');
-      if (roleLabelEl) {
-        roleLabelEl.innerHTML = {
-          'shadow': '_sh',
-          'highlight': '_hl',
-          'ao': '_ao',
-          'none': '&nbsp;'
-        }[role];
-      }
+      renderPalette();
     }
 
-    function rgbToHex(r, g, b) {
-      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    function deleteColor(idx) {
+      if (idx < 2) return;
+      colors.splice(idx, 1);
+      renderPalette();
+    }
+
+    function addColor() {
+      const ids = colors.map(c => parseInt(getShortId(c.id))).filter(n => !isNaN(n));
+      const nextId = (ids.length ? Math.max(...ids) : 0) + 1;
+      
+      // Determine if there is a prefix (OpenToonz sometimes adds GUID-like prefixes)
+      const firstId = colors[0]?.id || "";
+      const prefix = firstId.includes('-') ? firstId.split('-')[0].replace(/"/g, '') + '-' : '';
+      
+      colors.push({
+        hasTrace: false, 
+        id: `"${prefix}${nextId}"`, 
+        name: 'new_color',
+        appFlag: '0', 
+        r: 120, g: 120, b: 120, a: 255, 
+        role: 'none',
+        originalIndex: colors.length
+      });
+      renderPalette();
+      
+      // Auto-scroll to bottom of content
+      setTimeout(() => {
+        const content = document.getElementById('content');
+        content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
+      }, 50);
+    }
+
+    function newPalette() {
+      const name = prompt("Enter a name for the new palette:", "new_palette");
+      if (!name) return;
+      
+      paletteData = { name, version: CONFIG.DEFAULT_TPL_VER, shortcuts: "" };
+      colors = [
+        { hasTrace: false, id: '"0"', name: 'bg',  appFlag: '0', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
+        { hasTrace: false, id: '"1"', name: 'ink', appFlag: '0', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
+      ];
+      
+      ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
+      renderPalette();
+    }
+
+    /**
+     * HUE FILTER LOGIC
+     */
+    function toggleHueControls() {
+      const isVisible = document.getElementById('hueFilterCheck').checked;
+      document.querySelector('.hue-controls').style.display = isVisible ? 'flex' : 'none';
+      renderPalette();
+    }
+
+    function updateHueUI() {
+      const h = document.getElementById('hueSlider').value;
+      const t = document.getElementById('hueThresholdSlider').value;
+      document.getElementById('hue-val').textContent = h + "°";
+      document.getElementById('hue-threshold-val').textContent = "±" + t + "°";
+      document.getElementById('huePreview').style.backgroundColor = `hsl(${h}, 100%, 50%)`;
+      renderPalette();
     }
 
     function rgbToHsl(r, g, b) {
-      r /= 255, g /= 255, b /= 255;
-      const max = Math.max(r, g, b), min = Math.min(r, g, b);
-      let h, s, l = (max + min) / 2;
-
-      if (max === min) {
-        h = s = 0; // achromatic
-      } else {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+      let h = 0, s = max === 0 ? 0 : d / max, l = (max + min) / 2;
+      if (max !== min) {
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
         h /= 6;
       }
-
-      return { h: h * 360, s: s, l: l };
+      return { h: h * 360, s, l };
     }
 
+    /**
+     * UTILITIES
+     */
     async function copyIdsToClipboard() {
-      if (lastFilteredColors.length === 0) return;
-
-      const ids = lastFilteredColors.map(c => {
-        const idString = c.id.slice(1, -1);
-        const parts = idString.split('-');
-        return parts[parts.length - 1];
-      }).join(',');
-
-      const copyBtn = document.querySelector('#id-copier button');
-      if (!ids || !copyBtn) return;
-
-      await navigator.clipboard.writeText(ids);
-      const originalContent = copyBtn.textContent;
-      copyBtn.textContent = 'Copied!';
-      copyBtn.disabled = true;
-      setTimeout(() => {
-        copyBtn.textContent = originalContent;
-        copyBtn.disabled = false;
-      }, 1500);
-    }
-
-    function exportJson() {
-      if (!paletteData) return;
-
-      const simplifiedColors = colors.map(c => {
-        const idString = c.id.slice(1, -1);
-        const parts = idString.split('-');
-        const numericId = parts[parts.length - 1];
-
-        return {
-          id: parseInt(numericId, 10),
-          fullId: idString,
-          name: c.name,
-          role: c.role,
-          hasTrace: c.hasTrace,
-          color: { r: c.r, g: c.g, b: c.b, a: c.a }
-        };
-      });
-
-      const jsonString = JSON.stringify(simplifiedColors, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${paletteData.name}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const ids = lastFilteredColors.map(c => getShortId(c.id)).join(',');
+      try {
+        await navigator.clipboard.writeText(ids);
+        const btn = document.querySelector('#id-copier-container button');
+        const oldText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = 'var(--success-color)';
+        setTimeout(() => {
+          btn.textContent = oldText;
+          btn.style.background = '';
+        }, 1500);
+      } catch (err) {
+        console.error('Failed to copy!', err);
+      }
     }
 
     function exportPalette() {
@@ -1176,20 +747,31 @@
       let xml = `<palette name="${paletteData.name}">\n  <version>\n    ${paletteData.version}\n  </version>\n  <styles>\n`;
       colors.forEach(c => {
         const trace = c.hasTrace ? '_1 ' : '';
-        let exportName = c.name;
-        if (c.role === 'shadow') exportName += '_sh';
-        else if (c.role === 'highlight') exportName += '_hl';
-        else if (c.role === 'ao') exportName += '_ao';
+        let exportName = getFullExportName(c);
 
         xml += `    <style>\n      ${trace}${c.id}${exportName} ${c.appFlag} ${c.r} ${c.g} ${c.b} ${c.a} \n    </style>\n`;
       });
       xml += `  </styles>\n  <stylepages>\n    <page>\n      <name>\n        colors \n      </name>\n      <indices>\n        ${colors.map((_, i) => i).join(' ')} \n      </indices>\n    </page>\n  </stylepages>\n  <shortcuts>\n    ${paletteData.shortcuts}\n  </shortcuts>\n</palette>`;
+      downloadFile(xml, `${paletteData.name}.tpl`, 'text/plain');
+    }
 
-      const blob = new Blob([xml], { type: 'text/plain' });
+    function exportJson() {
+      if (!paletteData) return;
+      const data = colors.map(c => ({ 
+        id: getShortId(c.id), 
+        name: c.name, 
+        role: c.role, 
+        color: { r: c.r, g: c.g, b: c.b, a: c.a } 
+      }));
+      downloadFile(JSON.stringify(data, null, 2), `${paletteData.name}.json`, 'application/json');
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `${paletteData.name}.tpl`;
+      a.href = url; 
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1198,4 +780,3 @@
   </script>
 </body>
 </html>
-
