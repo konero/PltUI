@@ -1020,7 +1020,7 @@ input[type="checkbox"]:checked::before {
       const textColor = getContrastColor(color.r, color.g, color.b);
       const roleCfg = CONFIG.ROLES[color.role];
       
-      // Define the checkered pattern to match your CSS class
+      // Define a checkered pattern
       const checkeredPattern = `repeating-conic-gradient(#fff 0% 25%, #ccc 0% 50%)`;
       
       return `
@@ -1192,3 +1192,4 @@ input[type="checkbox"]:checked::before {
   </script>
 </body>
 </html>
+
