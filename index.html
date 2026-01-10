@@ -460,6 +460,9 @@ button.secondary {
   border-radius: 4px;
   cursor: pointer;
 }
+.color-picker-input:disabled {
+  cursor: not-allowed;
+}
 
 .meta-inputs {
   flex: 1;
@@ -499,6 +502,10 @@ button.secondary {
   background: rgba(0, 0, 0, 0.34);
   border-radius: 3px;
   outline: none;
+}
+.alpha-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .alpha-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -570,6 +577,10 @@ button.secondary {
   background: var(--input-bg-color);
   border: 1px solid var(--border-light-color);
   border-radius: 6px;
+}
+.role-selector.disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .role-selector input {
@@ -753,7 +764,7 @@ input[type="checkbox"]:checked::before {
      */
     const CONFIG = {
       APP_NAME: "PltUI",
-      VERSION: "v1.0.2",
+      VERSION: "v1.0.3",
       AUTHOR: "KONERO",
       DEFAULT_TPL_VER: "71 0",
       ROLES: {
@@ -984,19 +995,19 @@ input[type="checkbox"]:checked::before {
           </div>
           
           <div class="swatch-row">
-            <input type="color" class="color-picker-input" value="${hex}" oninput="updateColor(${idx}, this.value)">
+            <input type="color" class="color-picker-input" value="${hex}" oninput="updateColor(${idx}, this.value)" ${idx === 0 ? 'disabled' : ''}>
               <div class="meta-inputs">
                 ${idx >= 2 ? `<label class="toggle-label"><input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="colors[${idx}].hasTrace=this.checked"> Autopaint</label>` : '<div style="height: 22px;"></div>'}
-                <div class="alpha-row">
-                  <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)">
-                  <span class="version-tag" id="a-val-${idx}" style="min-width: 20px; text-align: right; position: relative; top: 0px;">${color.a}</span>
+              <div class="alpha-row">
+                <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)" ${idx < 2 ? 'disabled' : ''}>
+                <span class="version-tag" id="a-val-${idx}" style="min-width: 20px; text-align: right; position: relative; top: 0px;">${color.a}</span>
               </div>
             </div>
           </div>
           
-          <div class="role-selector">
+          <div class="role-selector ${idx < 2 ? 'disabled' : ''}">
             ${Object.keys(CONFIG.ROLES).map(r => `
-              <input type="radio" name="role-grp-${idx}" id="role-${r}-${idx}" ${color.role === r ? 'checked' : ''} onchange="updateRole(${idx},'${r}')">
+              <input type="radio" name="role-grp-${idx}" id="role-${r}-${idx}" ${color.role === r ? 'checked' : ''} onchange="updateRole(${idx},'${r}')" ${idx < 2 ? 'disabled' : ''}>
               <label for="role-${r}-${idx}">${CONFIG.ROLES[r].label}</label>
             `).join('')}
           </div>
