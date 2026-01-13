@@ -45,6 +45,17 @@ export function selectColor(idx, forceSelect = false) {
   // Update the color wheel to reflect current selection
   updateWheelFromSelection();
   
+  // Update sidebar eyedropper button state (do this after wheel update)
+  // Use a small delay to ensure all state updates have propagated
+  setTimeout(() => {
+    const eyedropperBtn = document.getElementById('sidebar-eyedropper-btn');
+    if (eyedropperBtn) {
+      // Enable for idx >= 1 (ink and user colors), disable for bg (0) or no selection (-1)
+      const idx = State.selectedColorIndex;
+      eyedropperBtn.disabled = idx < 1;
+    }
+  }, 0);
+  
   // Update the selected card to show current frame's color
   import('./timeline.js').then(module => {
     module.updateUIForCurrentFrame();

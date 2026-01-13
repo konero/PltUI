@@ -10,6 +10,7 @@ import * as Timeline from './timeline.js';
 import * as Exporter from './exporter.js';
 import * as UI from './ui.js';
 import * as WheelManager from './wheelManager.js';
+import * as Eyedropper from './eyedropper.js';
 
 /**
  * Initialize the application
@@ -27,6 +28,24 @@ function init() {
   
   // Initialize context menu
   UI.initContextMenu();
+  
+  // Setup keyboard shortcuts
+  setupKeyboardShortcuts();
+}
+
+/**
+ * Setup keyboard shortcuts
+ */
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Don't trigger shortcuts when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    // 'E' or 'I' key for eyedropper (I is common for "pick" in graphics software)
+    if (e.key === 'e' || e.key === 'E' || e.key === 'i' || e.key === 'I') {
+      Eyedropper.activateEyedropper();
+    }
+  });
 }
 
 /**
@@ -88,7 +107,9 @@ function exposeGlobalFunctions() {
     toggleHueControls: UI.toggleHueControls,
     updateHueUI: UI.updateHueUI,
     copyIdsToClipboard: UI.copyIdsToClipboard,
-    renderPalette: renderPalette
+    renderPalette: renderPalette,
+    activateEyedropper: Eyedropper.activateEyedropper,
+    activateEyedropperForCard: Eyedropper.activateEyedropperForCard
   };
   
   // Timeline functions

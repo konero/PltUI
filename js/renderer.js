@@ -91,6 +91,12 @@ export function generateCardHTML(color) {
   // Check if color has keyframes (is animated)
   const isAnimated = color.keyframes && color.keyframes.length > 0;
   
+  // Eyedropper button (only show for colors that can be edited, idx >= 1)
+  const eyedropperBtn = idx >= 1 ? `
+    <button class="eyedropper-btn" 
+            onclick="event.stopPropagation(); window.AppUI.activateEyedropperForCard(${idx})" 
+            title="Pick color from screen (E/I)">Pick</button>` : '';
+  
   return `
     <div class="color-card-preview ${roleCfg.cssClass} ${idx === selectedColorIndex ? 'selected' : ''}" 
          id="card-${idx}"
@@ -99,6 +105,7 @@ export function generateCardHTML(color) {
          oncontextmenu="window.AppUI.showContextMenu(event, ${idx})"
          style="background-image: linear-gradient(${rgba}, ${rgba}), ${checkeredPattern}; background-size: auto, 20px 20px;">
       <div class="preview-name" style="color: ${textColor};">${color.name}</div>
+      ${eyedropperBtn}
       ${isAnimated ? '<div class="preview-badge top-left"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2 L2 12 L12 22 L22 12 Z"/></svg></div>' : ''}
       ${color.hasTrace && idx >= 2 ? '<div class="preview-badge bottom-left">A</div>' : ''}
       <div class="preview-badge bottom-right">#${getShortId(color.id)}</div>
