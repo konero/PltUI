@@ -171,6 +171,42 @@ body {
   font-size: var(--font-size-sm);
   color: var(--sub-text);
   word-break: break-all;
+  flex: 1;
+}
+
+.sidebar-eyedropper-btn {
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 8px;
+  border: 1px solid var(--border-light-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sidebar-eyedropper-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #fff;
+}
+
+.sidebar-eyedropper-btn:active {
+  transform: scale(0.98);
+}
+
+.sidebar-eyedropper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sidebar-eyedropper-btn:disabled:hover {
+  background: var(--card-bg);
+  border-color: var(--border-light-color);
+  color: var(--text-color);
 }
 
 .slider-group-label {
@@ -187,6 +223,12 @@ body {
 .sidebar-section:first-child .slider-group-label {
   border-top: none;
   margin-top: 0;
+}
+
+.sidebar-section.slider-divider {
+  border-top: 1px solid var(--border-light-color);
+  padding-top: 6px;
+  margin-top: 2px;
 }
 
 .sliders-group {
@@ -809,6 +851,56 @@ input[type="checkbox"]:checked::before {
 .preview-badge.bottom-right {
   bottom: 4px;
   right: 4px;
+}
+
+
+/* ==========================================================================
+   Eyedropper Button (Color Picker on Cards)
+   ========================================================================== */
+
+.eyedropper-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.eyedropper-btn:hover {
+  background: #fff;
+}
+
+.eyedropper-btn:active {
+  background: #eee;
+}
+
+.color-card-preview:hover .eyedropper-btn {
+  display: block;
+}
+
+
+/* ==========================================================================
+   Eyedropper Active State
+   ========================================================================== */
+
+/* Visual indicator when eyedropper is active */
+body.eyedropper-active {
+  cursor: crosshair !important;
+}
+
+body.eyedropper-active * {
+  cursor: crosshair !important;
 }
 
 
