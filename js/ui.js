@@ -277,7 +277,7 @@ export function addColor() {
   
   const firstId = State.colors[0]?.id || "";
   const prefix = State.paletteData?.prefix 
-    ? State.paletteData.prefix + '-' 
+    ? '|-' + State.paletteData.prefix + '-' 
     : (firstId.includes('-') ? firstId.split('-')[0].replace(/"/g, '') + '-' : '');
   
   // Clone color from current selection if available, otherwise use default gray
@@ -298,7 +298,7 @@ export function addColor() {
     hasTrace: false, 
     id: `"${prefix}${nextId}"`,
     name: 'new_color',
-    tagID: '0', 
+    tagID: '3', 
     r: newR, g: newG, b: newB, a: newA, 
     role: 'none',
     originalIndex: newColorIndex,
@@ -329,12 +329,13 @@ export function newPalette() {
     name, 
     version: CONFIG.DEFAULT_TPL_VER, 
     shortcuts: "0 1 -1 -1 -1 -1 -1 -1 -1 -1 ", 
-    prefix 
+    prefix,
+    isStudioPalette: true
   });
   
   State.setColors([
-    { hasTrace: false, id: `"${prefix}-0"`, name: 'bg',  tagID: '3', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
-    { hasTrace: false, id: `"${prefix}-1"`, name: 'ink', tagID: '3', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
+    { hasTrace: false, id: `"|-${prefix}-0"`, name: 'bg',  tagID: '3', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
+    { hasTrace: false, id: `"|-${prefix}-1"`, name: 'ink', tagID: '3', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
   ]);
   
   ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
