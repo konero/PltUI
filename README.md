@@ -3,7 +3,9 @@
 # PltUI
 
 A cheerful, web-based palette manager for OpenToonz / Tahoma2D (`.tpl`) that runs entirely in the browser.
-<br/>
+
+---
+
 <img src="images/example1.png">
 </div>
 
