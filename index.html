@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PltUI - Palette Manager</title>
 
+
   <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -12,676 +13,12 @@
   <link rel="icon" type="image/png" sizes="192x192" href="images/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="images/android-chrome-512x512.png">
 
-  <style>
-/* ==========================================================================
-   Design Tokens / Theme
-   ========================================================================== */
-:root {
-  /* Colors */
-  --primary-color: #e06c75;
-  --accent-color: #ab641d;
-  --bg-color: #282c34;
-  --card-bg: #3a3f4b;
-  --input-bg-color: #2c313a;
-  --border-color: #21252b;
-  --border-light-color: #444;
-  --text-color: #e0e0e0;
-  --sub-text: #a0a0a0;
-  --success-color: #98c379;
-  --hue-filter-color: hsl(0, 100%, 50%);
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="style.css">
 
-  /* Gradients (role-based) */
-  --shadow-grad: linear-gradient(to right, rgba(102, 106, 209, 0.25), transparent);
-  --highlight-grad: linear-gradient(to right, rgba(231, 76, 60, 0.25), transparent);
-  --ao-grad: linear-gradient(to right, rgba(152, 195, 121, 0.25), transparent);
+  <!-- HexaColorWheel Color Picker -->
+  <script src="hexacolorwheel/hexacolorwheel.js"></script>
 
-  /* Typography */
-  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-family-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-  /* Sizing */
-  --border-radius-xs: 3px;
-  --border-radius-sm: 4px;
-  --border-radius-md: 6px;
-  --border-radius-lg: 8px;
-
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-md: 13px;
-  --font-size-lg: 14px;
-}
-
-
-/* ==========================================================================
-   Base / Reset
-   ========================================================================== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: var(--font-family-sans);
-  background: var(--bg-color);
-  color: var(--text-color);
-  line-height: 1.5;
-  overflow: hidden; /* handled by app-wrapper */
-}
-
-
-/* ==========================================================================
-   App Layout
-   ========================================================================== */
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 20px;
-  background: var(--border-color);
-  flex-wrap: wrap;
-  z-index: 100;
-}
-
-.app-footer {
-  flex-shrink: 0;
-  padding: 10px 20px;
-  background: var(--border-color);
-  border-top: 1px solid var(--border-light-color);
-  text-align: center;
-  color: var(--sub-text);
-  font-size: 11px;
-}
-
-.app-footer a {
-  color: var(--sub-text);
-  text-decoration: none;
-}
-
-.app-footer a:hover {
-  text-decoration: underline;
-}
-
-
-/* ==========================================================================
-   Header Elements
-   ========================================================================== */
-h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  color: #fff;
-  user-select: none;
-}
-
-.header-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--border-radius-xs);
-  object-fit: contain;
-}
-
-.version-tag {
-  position: relative;
-  top: 2px;
-  font-family: var(--font-family-code);
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--sub-text);
-  opacity: 0.6;
-}
-
-.toolbar {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
-button {
-  padding: 6px 14px;
-  background: var(--accent-color);
-  color: #fff;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-button:hover:not(:disabled) {
-  opacity: 0.8;
-}
-
-button:disabled {
-  background: #555;
-  color: #888;
-  cursor: not-allowed;
-}
-
-button.secondary {
-  background: #4a4a4a;
-  border: 1px solid #222;
-}
-
-
-/* ==========================================================================
-   Filter Bar
-   ========================================================================== */
-.filter-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px 20px;
-  background: var(--input-bg-color);
-  border-bottom: 1px solid var(--border-light-color);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  min-height: 38px; /* prevents layout shift */
-}
-
-
-/* Search */
-.search-group {
-  display: flex;
-  flex-grow: 1;
-  min-width: 250px;
-  background: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: var(--border-radius-sm);
-  transition: border-color 0.2s;
-}
-
-.search-group:focus-within {
-  border-color: var(--accent-color);
-}
-
-#searchInput {
-  flex: 1;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: var(--font-size-lg);
-  outline: none;
-}
-
-.search-options {
-  display: flex;
-  align-items: center;
-  padding-right: 4px;
-}
-
-.search-options label {
-  display: grid;
-  place-content: center;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  font-family: var(--font-family-code);
-  font-weight: bold;
-  color: #777;
-  transition: color 0.2s;
-}
-
-.search-options span {
-  display: grid;
-  place-content: center;
-  width: 24px;
-  height: 24px;
-}
-
-.search-options input[type="checkbox"] {
-  display: none;
-}
-
-.search-options input:checked + span {
-  background: var(--border-light-color);
-  color: #fff;
-  border-radius: 4px;
-}
-
-
-/* Sort / Toggles */
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: var(--font-size-sm);
-  color: var(--sub-text);
-  cursor: pointer;
-  user-select: none;
-}
-
-.toggle-label:hover {
-  color: #fff;
-}
-
-.sort-options {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sort-label {
-  font-size: var(--font-size-sm);
-  color: var(--sub-text);
-}
-
-.sort-options select {
-  padding: 8px 12px;
-  background: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: var(--border-radius-sm);
-  color: #fff;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  outline: none;
-}
-
-
-/* ==========================================================================
-   Content Area
-   ========================================================================== */
-#content {
-  flex: 1;
-  padding: 20px;
-  background: var(--bg-color);
-  overflow-y: auto;
-}
-
-/* Scrollbar */
-#content::-webkit-scrollbar {
-  width: 8px;
-}
-
-#content::-webkit-scrollbar-track {
-  background: var(--bg-color);
-}
-
-#content::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 4px;
-}
-
-#content::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-
-/* ==========================================================================
-   Hue Filter UI
-   ========================================================================== */
-.hue-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  padding: 4px 0;
-}
-
-.hue-color-preview {
-  width: 14px;
-  height: 14px;
-  border-radius: 2px;
-  border: 1px solid #000;
-  flex-shrink: 0;
-}
-
-.hue-val-text {
-  width: 35px;
-  font-family: var(--font-family-code);
-  font-size: 11px;
-  color: var(--sub-text);
-}
-
-
-/* ==========================================================================
-   Palette Grid & Cards
-   ========================================================================== */
-.palette-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.color-card {
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  position: relative;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-/* Role states */
-.color-card.is-shadow {
-  background-image: var(--shadow-grad);
-  border-color: rgba(102, 106, 209, 0.4);
-}
-
-.color-card.is-highlight {
-  background-image: var(--highlight-grad);
-  border-color: rgba(231, 76, 60, 0.4);
-}
-
-.color-card.is-ao {
-  background-image: var(--ao-grad);
-  border-color: rgba(152, 195, 121, 0.4);
-}
-
-
-/* Card Header */
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.card-header .text-input {
-  flex: 1;
-  min-width: 0;
-}
-
-.color-id-badge,
-.color-role-badge {
-  font-family: var(--font-family-code);
-  font-size: 11px;
-  padding: 4px 6px;
-  background: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: 2px;
-  color: var(--sub-text);
-  user-select: none;
-}
-
-.color-role-badge {
-  min-width: 35px;
-  text-align: center;
-  color: var(--accent-color);
-}
-
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  color: #fff;
-  cursor: pointer;
-  display: grid;
-  place-content: center;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.delete-btn:hover {
-  background: var(--primary-color);
-}
-
-
-/* Swatches & Inputs */
-.swatch-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.color-picker-input {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  background: none;
-  border: 0;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.color-picker-input:disabled {
-  cursor: not-allowed;
-}
-
-.meta-inputs {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.text-input {
-  width: 100%;
-  padding: 6px 10px;
-  background: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: 4px;
-  color: #fff;
-  font-size: var(--font-size-md);
-}
-
-.text-input:focus {
-  border-color: var(--accent-color);
-  outline: none;
-}
-
-
-/* Alpha Slider */
-.alpha-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.alpha-slider { 
-  flex: 1; 
-  height: 6px; 
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background: rgba(0, 0, 0, 0.34);
-  border-radius: 3px;
-  outline: none;
-}
-.alpha-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.alpha-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--card-bg);
-  cursor: pointer;
-  border: 2px solid var(--sub-text);
-}
-.alpha-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--card-bg);
-  cursor: pointer;
-  border: 2px solid var(--sub-text);
-}
-
-
-/* ==========================================================================
-   Preview Card
-   ========================================================================== */
-.color-card-preview {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 0;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.preview-name {
-  padding: 20px;
-  font-size: 16px;
-  font-weight: 600;
-  text-align: center;
-  word-break: break-word;
-}
-
-.preview-badge {
-  position: absolute;
-  padding: 4px 6px;
-  background: #fff;
-  color: #000;
-  font-family: var(--font-family-code);
-  font-size: 10px;
-  font-weight: bold;
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-.preview-badge.top-right { top: 4px; right: 4px; }
-.preview-badge.bottom-left { bottom: 4px; left: 4px; }
-.preview-badge.bottom-right { bottom: 4px; right: 4px; }
-
-
-/* ==========================================================================
-   Role Selector (Custom Radio)
-   ========================================================================== */
-.role-selector {
-  display: flex;
-  padding: 2px;
-  background: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: 6px;
-}
-.role-selector.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.role-selector input {
-  display: none;
-}
-
-.role-selector label {
-  flex: 1;
-  padding: 5px;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-  letter-spacing: 0.05em;
-  color: #777;
-  cursor: pointer;
-}
-
-.role-selector input:checked + label {
-  background: var(--card-bg);
-  color: #fff;
-  border-radius: 4px;
-}
-
-
-/* ==========================================================================
-   Checkbox Styling
-   ========================================================================== */
-input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  background-color: var(--input-bg-color);
-  border: 1px solid var(--border-light-color);
-  border-radius: var(--border-radius-xs);
-  display: grid;
-  place-content: center;
-  cursor: pointer;
-  appearance: none;
-}
-
-input[type="checkbox"]::before {
-  content: "";
-  width: 0.75em;
-  height: 0.75em;
-  transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em white;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-}
-
-input[type="checkbox"]:checked {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
-}
-
-input[type="checkbox"]:checked::before {
-  transform: scale(1);
-}
-
-
-/* ==========================================================================
-   Empty State
-   ========================================================================== */
-.empty-state {
-  margin: 0;
-  padding: 80px 40px;
-  text-align: center;
-  color: #555;
-  border: 2px dashed var(--border-light-color);
-  border-radius: 12px;
-}
-
-
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-@media (max-width: 650px) {
-  header {
-    justify-content: center;
-  }
-
-  .toolbar {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .search-group {
-    width: 100%;
-    min-width: 100%;
-  }
-
-  .hue-controls {
-    justify-content: center;
-  }
-}
-  </style>
 </head>
 <body>
 
@@ -689,507 +26,115 @@ input[type="checkbox"]:checked::before {
     <header id="main-header"></header>
     
     <div class="filter-bar">
-      <!-- Search and View Row -->
-      <div class="filter-row">
-        <div class="search-group">
-          <input type="search" id="searchInput" placeholder="Search by name or suffix (e.g., hair / *_sh)" oninput="renderPalette()">
-          <div class="search-options">
-            <label title="Match Case"><input type="checkbox" id="matchCaseCheck" onchange="renderPalette()"><span>Aa</span></label>
-            <label title="Match Whole Word"><input type="checkbox" id="matchWholeWordCheck" onchange="renderPalette()"><span>""</span></label>
-          </div>
-        </div>
+          <!-- Search and View Row -->
+          <div class="filter-row">
+            <div class="search-group">
+              <input type="search" id="searchInput" placeholder="Search by name or suffix (e.g., hair / *_sh)" oninput="window.AppUI.renderPalette()">
+              <div class="search-options">
+                <label title="Match Case"><input type="checkbox" id="matchCaseCheck" onchange="window.AppUI.renderPalette()"><span>Aa</span></label>
+                <label title="Match Whole Word"><input type="checkbox" id="matchWholeWordCheck" onchange="window.AppUI.renderPalette()"><span>""</span></label>
+              </div>
+            </div>
 
-        <div class="sort-options">
-          <label for="sortSelect" class="sort-label">Order:</label>
-          <select id="sortSelect" onchange="renderPalette()">
-            <option value="default">ID</option>
-            <option value="name">Name</option>
-            <option value="color">Color</option>
-          </select>
-          <select id="sortDir" onchange="renderPalette()" style="width: 50px; padding: 8px 5px;">
-            <option value="asc">↑</option>
-            <option value="desc">↓</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Actions and Hue Row -->
-      <div class="filter-row" style="align-items: center;">
-        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <span class="sort-label">View Type:</span>
-          <div class="role-selector" style="width: auto; display: inline-flex;">
-            <input type="radio" name="view-mode" id="view-edit" value="edit" checked onchange="renderPalette()">
-            <label for="view-edit">EDITOR</label>
-            <input type="radio" name="view-mode" id="view-preview" value="preview" onchange="renderPalette()">
-            <label for="view-preview">PREVIEW</label>
-          </div>
-          <span class="sort-label">Group By:</span>
-          <label class="toggle-label">
-            <input type="checkbox" id="pairedViewCheck" onchange="renderPalette()"> 
-            Name
-          </label>
-          <span style="color: var(--border-light-color); user-select: none;">|</span>
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <label class="toggle-label"><input type="checkbox" id="hueFilterCheck" onchange="toggleHueControls()"> Hue</label>
-            <div class="hue-controls" style="display: none;">
-              <div class="hue-color-preview" id="huePreview"></div>
-              <input type="range" class="alpha-slider" id="hueSlider" min="0" max="360" value="0" style="width:100px" oninput="updateHueUI()">
-              <span id="hue-val" class="hue-val-text">0°</span>
-              <input type="range" class="alpha-slider" id="hueThresholdSlider" min="0" max="180" value="15" style="width:80px" oninput="updateHueUI()">
-              <span id="hue-threshold-val" class="hue-val-text">±15°</span>
+            <div class="sort-options">
+              <label for="sortSelect" class="sort-label">Order:</label>
+              <select id="sortSelect" onchange="window.AppUI.renderPalette()">
+                <option value="default">ID</option>
+                <option value="name">Name</option>
+                <option value="color">Color</option>
+              </select>
+              <select id="sortDir" onchange="window.AppUI.renderPalette()" style="width: 50px; padding: 8px 5px;">
+                <option value="asc">↑</option>
+                <option value="desc">↓</option>
+              </select>
             </div>
           </div>
-        </div>
 
-        <div id="id-copier-container" style="display: none; gap: 8px; margin-left: auto;">
-          <button class="secondary" onclick="addColor()" id="addBtn" disabled>New Colour</button>
-          <button class="secondary" onclick="copyIdsToClipboard()">Copy Visible IDs</button>
-        </div>
-      </div>
+          <!-- Actions and Hue Row -->
+          <div class="filter-row" style="align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span class="sort-label">Group By:</span>
+              <label class="toggle-label">
+                <input type="checkbox" id="pairedViewCheck" onchange="window.AppUI.renderPalette()"> 
+                Name
+              </label>
+              <span style="color: var(--border-light-color); user-select: none;">|</span>
+              <span class="sort-label">Filter:</span>
+              <label class="toggle-label">
+                <input type="checkbox" id="animatedFilterCheck" onchange="window.AppUI.renderPalette()"> 
+                Animated
+              </label>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <label class="toggle-label"><input type="checkbox" id="hueFilterCheck" onchange="window.AppUI.toggleHueControls()"> Hue</label>
+                <div class="hue-controls" style="display: none;">
+                  <div class="hue-color-preview" id="huePreview"></div>
+                  <input type="range" class="alpha-slider" id="hueSlider" min="0" max="360" value="0" style="width:100px" oninput="window.AppUI.updateHueUI()">
+                  <span id="hue-val" class="hue-val-text">0°</span>
+                  <input type="range" class="alpha-slider" id="hueThresholdSlider" min="0" max="180" value="15" style="width:80px" oninput="window.AppUI.updateHueUI()">
+                  <span id="hue-threshold-val" class="hue-val-text">±15°</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="id-copier-container" style="display: none; gap: 8px; margin-left: auto;">
+              <button class="secondary" onclick="window.AppUI.addColor()" id="addBtn" disabled>New Colour</button>
+              <button class="secondary" onclick="window.AppUI.copyIdsToClipboard()">Copy Visible IDs</button>
+            </div>
+          </div>
     </div>
 
-    <div id="content">
-      <div class="empty-state">
-        <h2 style="margin-bottom:10px; color:var(--sub-text)">No Palette Loaded</h2>
-        <p>Create or import a <strong>.tpl</strong> file to start editing.</p>
+    <div class="main-content-area">
+      <!-- Left Sidebar: Color Wheel -->
+      <aside class="color-sidebar" id="color-sidebar">
+        <div class="sidebar-section">
+          <div id="wheel-container" class="wheel-container"></div>
+          <div class="color-preview-row">
+            <div id="color-preview-swatch" class="color-preview-swatch"></div>
+            <span id="color-preview-hex" class="color-preview-hex">No color selected</span>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <div class="slider-group-label">HSV</div>
+          <div id="hsv-sliders" class="sliders-group"></div>
+        </div>
+        <div class="sidebar-section">
+          <div class="slider-group-label">Alpha</div>
+          <div id="alpha-slider" class="sliders-group"></div>
+        </div>
+        <div class="sidebar-section">
+          <div class="slider-group-label">RGB</div>
+          <div id="rgb-sliders" class="sliders-group"></div>
+        </div>
+        <div id="sliders-container"></div>
+      </aside>
+    
+      <div id="content">
+        <div class="empty-state">
+          <h2 style="margin-bottom:10px; color:var(--sub-text)">No Palette Loaded</h2>
+          <p>Create or import a <strong>.tpl</strong> file to start editing.</p>
+        </div>
       </div>
+    </div><!-- end main-content-area -->
+
+    <div id="timeline-container" style="display: none;"></div>
+
+    <!-- Context Menu for Color Cards -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+      <div class="context-menu-item" data-action="rename">Rename</div>
+      <div class="context-menu-item" data-action="toggle-autopaint">Toggle Autopaint</div>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item" data-action="mark-base">Mark as Base</div>
+      <div class="context-menu-item" data-action="mark-shadow">Mark as Shadow</div>
+      <div class="context-menu-item" data-action="mark-highlight">Mark as Highlight</div>
+      <div class="context-menu-item" data-action="mark-ao">Mark as AO</div>
+      <div class="context-menu-divider"></div>
+      <div class="context-menu-item danger" data-action="delete">Delete Colour</div>
     </div>
 
     <footer class="app-footer" id="main-footer"></footer>
   </div>
 
-  <script>
-    /**
-     * CENTRAL CONFIGURATION
-     */
-    const CONFIG = {
-      APP_NAME: "PltUI",
-      VERSION: "v1.0.3",
-      AUTHOR: "KONERO",
-      DEFAULT_TPL_VER: "71 0",
-      ROLES: {
-        none:      { suffix: '',    label: 'BASE',   cssClass: '' },
-        shadow:    { suffix: '_sh', label: 'SHADOW', cssClass: 'is-shadow' },
-        highlight: { suffix: '_hl', label: 'LIGHT', cssClass: 'is-highlight' },
-        ao:        { suffix: '_ao', label: 'AO',     cssClass: 'is-ao' }
-      }
-    };
-
-    let paletteData = null;
-    let colors = [];
-    let lastFilteredColors = [];
-
-    // Setup Dynamic UI Elements
-    window.addEventListener('DOMContentLoaded', () => {
-      // Header
-      document.getElementById('main-header').innerHTML = `
-        <h1>
-          <img src="images/favicon-48.png" alt="" class="header-logo" onerror="this.style.display='none'">
-          ${CONFIG.APP_NAME} <span class="version-tag">${CONFIG.VERSION}</span>
-        </h1>
-        <div class="toolbar">
-          <button class="secondary" onclick="newPalette()">New TPL</button>
-          <button class="secondary" onclick="document.getElementById('fileInput').click()">Load TPL</button>
-          <button class="secondary" onclick="exportPalette()" id="exportBtn" disabled>Export TPL</button>
-          <button class="secondary" onclick="exportJson()" id="exportJsonBtn" class="secondary" disabled>Export JSON</button>
-          <input type="file" id="fileInput" style="display:none" accept=".tpl,.xml,.txt" onchange="handleFile(event)">
-        </div>`;
-      
-      // Footer
-      document.getElementById('main-footer').innerHTML = `
-        <span>Created by <strong>${CONFIG.AUTHOR}</strong></span>
-        <span style="margin: 0 10px; opacity:0.3">|</span>
-        <span><a href="https://github.com/konero/PltUI" target="_blank">Contribute</a></span>
-        <span style="margin: 0 10px; opacity:0.3">|</span>
-        <span><a href="">Offline</a></span>
-        <span style="margin: 0 10px; opacity:0.3">|</span>
-        <span><a href="">Help</a></span>`;
-
-      // Set initial hue preview color
-      const h = document.getElementById('hueSlider').value;
-      document.getElementById('huePreview').style.backgroundColor = `hsl(${h}, 100%, 50%)`;
-    });
-
-    /**
-     * HELPERS
-     */
-    const getFullExportName = (color) => color.name + (CONFIG.ROLES[color.role]?.suffix || '');
-
-    const getShortId = (fullId) => {
-      const clean = fullId.replace(/"/g, '');
-      const parts = clean.split('-');
-      return parts[parts.length - 1];
-    };
-
-    function getContrastColor(r, g, b) {
-      // Calculate relative luminance
-      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      return luminance > 0.5 ? '#000' : '#fff';
-    }
-
-    function handleFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => parseTPL(e.target.result);
-      reader.readAsText(file);
-      event.target.value = ''; // Reset input
-    }
-
-    function parseTPL(xmlString) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-      const paletteNode = xmlDoc.querySelector('palette');
-      if (!paletteNode) return alert("Error: Could not find <palette> node. Is this a valid TPL file?");
-
-      paletteData = {
-        name: paletteNode.getAttribute('name') || "new_palette",
-        version: xmlDoc.querySelector('version')?.textContent.trim() || CONFIG.DEFAULT_TPL_VER,
-        shortcuts: xmlDoc.querySelector('shortcuts')?.textContent.trim() || ""
-      };
-
-      colors = [];
-      const styles = xmlDoc.querySelectorAll('style');
-      // TPL Regex: matches trace, ID, name, tagID, R, G, B, A
-      const styleRegex = /^\s*(_1\s+)?("[^"]+")([^\s]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/;
-
-      styles.forEach((style, index) => {
-        const match = style.textContent.trim().match(styleRegex);
-        if (!match) return;
-
-        const rawName = match[3];
-        let role = 'none';
-        let cleanName = rawName;
-
-        // Determine role from suffix
-        for (const [key, val] of Object.entries(CONFIG.ROLES)) {
-          if (val.suffix && rawName.endsWith(val.suffix)) {
-            role = key;
-            cleanName = rawName.slice(0, -val.suffix.length);
-            break;
-          }
-        }
-
-        colors.push({
-          hasTrace: !!match[1],
-          id: match[2],
-          name: cleanName,
-          tagID: match[4],
-          r: parseInt(match[5]), g: parseInt(match[6]), b: parseInt(match[7]), a: parseInt(match[8]),
-          role: role,
-          originalIndex: index
-        });
-      });
-
-      // Enable UI
-      ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
-      renderPalette();
-    }
-
-    /**
-     * FILTERING LOGIC
-     */
-    function getFilteredList() {
-      const term = document.getElementById('searchInput').value;
-      const matchCase = document.getElementById('matchCaseCheck').checked;
-      const matchWhole = document.getElementById('matchWholeWordCheck').checked;
-      const hueOn = document.getElementById('hueFilterCheck').checked;
-      
-      let results = [...colors];
-
-      if (term) {
-        // Convert * to wildcard regex
-        const pattern = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*');
-        const regex = new RegExp(matchWhole ? `^${pattern}$` : pattern, matchCase ? '' : 'i');
-        results = results.filter(c => regex.test(getFullExportName(c)));
-      }
-
-      if (hueOn) {
-        const targetHue = parseInt(document.getElementById('hueSlider').value);
-        const threshold = parseInt(document.getElementById('hueThresholdSlider').value);
-        results = results.filter(c => {
-          const hsl = rgbToHsl(c.r, c.g, c.b);
-          if (hsl.s < 0.1) return false; // Ignore desaturated colors
-          const diff = Math.abs(hsl.h - targetHue);
-          return Math.min(diff, 360 - diff) <= threshold;
-        });
-      }
-      return results;
-    }
-
-    /**
-     * RENDERING
-     */
-    function renderPalette() {
-      const container = document.getElementById('content');
-      const filtered = getFilteredList();
-      const sortType = document.getElementById('sortSelect').value;
-      // Get the sort direction (1 for Ascending, -1 for Descending)
-      const sortDir = document.getElementById('sortDir').value === 'asc' ? 1 : -1;
-      
-      // Apply Sorting
-      filtered.sort((a, b) => {
-        let result = 0;
-
-        if (sortType === 'name') {
-          // Natural Sort: { numeric: true } handles the 1, 2, 10 sequence correctly
-          result = getFullExportName(a).localeCompare(getFullExportName(b), undefined, { 
-            numeric: true, 
-            sensitivity: 'base' 
-          });
-        } else if (sortType === 'color') {
-          result = rgbToHsl(a.r, a.g, a.b).h - rgbToHsl(b.r, b.g, b.b).h;
-        } else {
-          result = a.originalIndex - b.originalIndex;
-        }
-
-        // Multiply by direction to support ascending/descending
-        return result * sortDir;
-      });
-
-      lastFilteredColors = filtered;
-      document.getElementById('id-copier-container').style.display = colors.length ? 'flex' : 'none';
-
-      if (!colors.length) {
-        container.innerHTML = `<div class="empty-state">Import a file to begin</div>`;
-        return;
-      }
-      
-      if (!filtered.length) {
-        container.innerHTML = `<div class="empty-state">No colors match your current filters.</div>`;
-        return;
-      }
-
-      const isGrouped = document.getElementById('pairedViewCheck').checked;
-      const viewMode = document.querySelector('input[name="view-mode"]:checked')?.value || 'edit';
-      const cardGenerator = viewMode === 'preview' ? generatePreviewCardHTML : generateCardHTML;
-
-      if (isGrouped) {
-        const groups = filtered.reduce((acc, c) => {
-          (acc[c.name] = acc[c.name] || []).push(c);
-          return acc;
-        }, {});
-        
-        container.innerHTML = `<div style="display:grid;gap:20px">${Object.entries(groups).map(([name, group]) => `
-          <div style="background:rgba(0,0,0,0.15); padding:16px; border-radius:10px; border:1px solid var(--border-color)">
-            <div style="margin-bottom:12px; font-family:var(--font-family-code); font-weight:bold; color:var(--accent-color); font-size:14px">${name}</div>
-            <div class="palette-grid">${group.map(c => cardGenerator(c)).join('')}</div>
-          </div>`).join('')}</div>`;
-      } else {
-        container.innerHTML = `<div class="palette-grid">${filtered.map(c => cardGenerator(c)).join('')}</div>`;
-      }
-    }
-
-    function generateCardHTML(color) {
-      const idx = colors.indexOf(color);
-      const hex = "#" + [color.r, color.g, color.b].map(x => x.toString(16).padStart(2, '0')).join('');
-      const roleCfg = CONFIG.ROLES[color.role];
-      
-      return `
-        <div class="color-card ${roleCfg.cssClass}" id="card-${idx}">
-          <div class="card-header">
-            <span class="color-id-badge" title="TPL internal ID">#${getShortId(color.id)}</span>
-            <input type="text" class="text-input" value="${color.name}" oninput="colors[${idx}].name=this.value" placeholder="Name">
-            <span class="color-role-badge">${roleCfg.suffix || '&nbsp;'}</span>
-            ${idx >= 2 ? `<button class="delete-btn" title="Delete" onclick="deleteColor(${idx})">&times;</button>` : '<div style="width:24px"></div>'}
-          </div>
-          
-          <div class="swatch-row">
-            <input type="color" class="color-picker-input" value="${hex}" oninput="updateColor(${idx}, this.value)" ${idx === 0 ? 'disabled' : ''}>
-              <div class="meta-inputs">
-                ${idx >= 2 ? `<label class="toggle-label"><input type="checkbox" ${color.hasTrace ? 'checked' : ''} onchange="colors[${idx}].hasTrace=this.checked"> Autopaint</label>` : '<div style="height: 22px;"></div>'}
-              <div class="alpha-row">
-                <input type="range" class="alpha-slider" min="0" max="255" value="${color.a}" oninput="updateAlpha(${idx}, this.value)" ${idx < 2 ? 'disabled' : ''}>
-                <span class="version-tag" id="a-val-${idx}" style="min-width: 20px; text-align: right; position: relative; top: 0px;">${color.a}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="role-selector ${idx < 2 ? 'disabled' : ''}">
-            ${Object.keys(CONFIG.ROLES).map(r => `
-              <input type="radio" name="role-grp-${idx}" id="role-${r}-${idx}" ${color.role === r ? 'checked' : ''} onchange="updateRole(${idx},'${r}')" ${idx < 2 ? 'disabled' : ''}>
-              <label for="role-${r}-${idx}">${CONFIG.ROLES[r].label}</label>
-            `).join('')}
-          </div>
-        </div>`;
-    }
-
-    function generatePreviewCardHTML(color) {
-      const idx = colors.indexOf(color);
-      const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
-      const textColor = getContrastColor(color.r, color.g, color.b);
-      const roleCfg = CONFIG.ROLES[color.role];
-      
-      // Define a checkered pattern
-      const checkeredPattern = `repeating-conic-gradient(#fff 0% 25%, #ccc 0% 50%)`;
-      
-      return `
-        <div class="color-card-preview" style="background-image: linear-gradient(${rgba}, ${rgba}), ${checkeredPattern}; background-size: auto, 20px 20px;">
-          <div class="preview-name" style="color: ${textColor};">${color.name}</div>
-          ${color.hasTrace && idx >= 2 ? '<div class="preview-badge bottom-left">A</div>' : ''}
-          <div class="preview-badge bottom-right">#${getShortId(color.id)}</div>
-          ${roleCfg.suffix ? `<div class="preview-badge top-right">${roleCfg.suffix}</div>` : ''}
-        </div>`;
-    }
-
-    /**
-     * DATA UPDATES
-     */
-    function updateColor(idx, hex) {
-      colors[idx].r = parseInt(hex.slice(1, 3), 16);
-      colors[idx].g = parseInt(hex.slice(3, 5), 16);
-      colors[idx].b = parseInt(hex.slice(5, 7), 16);
-    }
-
-    function updateAlpha(idx, val) {
-      colors[idx].a = parseInt(val);
-      document.getElementById(`a-val-${idx}`).textContent = val;
-    }
-
-    function updateRole(idx, role) {
-      colors[idx].role = role;
-      renderPalette();
-    }
-
-    function deleteColor(idx) {
-      if (idx < 2) return;
-      colors.splice(idx, 1);
-      renderPalette();
-    }
-
-    function addColor() {
-      const ids = colors.map(c => parseInt(getShortId(c.id))).filter(n => !isNaN(n));
-      const nextId = (ids.length ? Math.max(...ids) : 0) + 1;
-      
-      // Determine prefix: prefer paletteData.prefix if available, otherwise fall back to existing id parsing
-      const firstId = colors[0]?.id || "";
-      const prefix = paletteData?.prefix ? paletteData.prefix + '-' : (firstId.includes('-') ? firstId.split('-')[0].replace(/"/g, '') + '-' : '');
-      
-      colors.push({
-        hasTrace: false, 
-        id: `"${prefix}${nextId}"`, 
-        name: 'new_color',
-        tagID: '3', 
-        r: 120, g: 120, b: 120, a: 255, 
-        role: 'none',
-        originalIndex: colors.length
-      });
-      renderPalette();
-      
-      // Auto-scroll to bottom of content
-      setTimeout(() => {
-        const content = document.getElementById('content');
-        content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
-      }, 50);
-    }
-
-    function newPalette() {
-      const name = prompt("Enter a name for the new palette:", "new_palette");
-      if (!name) return;
-      
-      const prefix = generatePalettePrefix();
-      paletteData = { name, version: CONFIG.DEFAULT_TPL_VER, shortcuts: "0 1 -1 -1 -1 -1 -1 -1 -1 -1 ", prefix };
-      colors = [
-        { hasTrace: false, id: `"${prefix}-0"`, name: 'bg',  tagID: '3', r: 255, g: 255, b: 255, a: 0,   role: 'none', originalIndex: 0 },
-        { hasTrace: false, id: `"${prefix}-1"`, name: 'ink', tagID: '3', r: 0,   g: 0,   b: 0,   a: 255, role: 'none', originalIndex: 1 }
-      ];
-      
-      ["addBtn", "exportBtn", "exportJsonBtn"].forEach(id => document.getElementById(id).disabled = false);
-      renderPalette();
-    }
-
-    /**
-     * HUE FILTER LOGIC
-     */
-    function toggleHueControls() {
-      const isVisible = document.getElementById('hueFilterCheck').checked;
-      document.querySelector('.hue-controls').style.display = isVisible ? 'flex' : 'none';
-      renderPalette();
-    }
-
-    function updateHueUI() {
-      const h = document.getElementById('hueSlider').value;
-      const t = document.getElementById('hueThresholdSlider').value;
-      document.getElementById('hue-val').textContent = h + "°";
-      document.getElementById('hue-threshold-val').textContent = "±" + t + "°";
-      document.getElementById('huePreview').style.backgroundColor = `hsl(${h}, 100%, 50%)`;
-      renderPalette();
-    }
-
-    function rgbToHsl(r, g, b) {
-      r /= 255; g /= 255; b /= 255;
-      const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
-      let h = 0, s = max === 0 ? 0 : d / max, l = (max + min) / 2;
-      if (max !== min) {
-        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-        else if (max === g) h = (b - r) / d + 2;
-        else h = (r - g) / d + 4;
-        h /= 6;
-      }
-      return { h: h * 360, s, l };
-    }
-
-    /**
-     * UTILITIES
-     */
-    async function copyIdsToClipboard() {
-      const ids = lastFilteredColors.map(c => getShortId(c.id)).join(',');
-      try {
-        await navigator.clipboard.writeText(ids);
-        const btn = document.querySelector('#id-copier-container button');
-        const oldText = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.style.background = 'var(--success-color)';
-        setTimeout(() => {
-          btn.textContent = oldText;
-          btn.style.background = '';
-        }, 1500);
-      } catch (err) {
-        console.error('Failed to copy!', err);
-      }
-    }
-
-    function exportPalette() {
-      if (!paletteData) return;
-      let xml = `<palette name="${paletteData.prefix || paletteData.name}">\n  <version>\n    ${paletteData.version}\n  </version>\n  <styles>\n`;
-      colors.forEach(c => {
-        const trace = c.hasTrace ? '_1 ' : '';
-        let exportName = getFullExportName(c);
-
-        xml += `    <style>\n      ${trace}${c.id}${exportName} ${c.tagID} ${c.r} ${c.g} ${c.b} ${c.a} \n    </style>\n`;
-      });
-      xml += `  </styles>\n  <stylepages>\n    <page>\n      <name>\n        colors \n      </name>\n      <indices>\n        ${colors.map((_, i) => i).join(' ')} \n      </indices>\n    </page>\n  </stylepages>\n  <shortcuts>\n    ${paletteData.shortcuts}\n  </shortcuts>\n</palette>`;
-      downloadFile(xml, `${paletteData.name}.tpl`, 'text/plain');
-    }
-
-    function exportJson() {
-      if (!paletteData) return;
-      const data = colors.map(c => ({ 
-        id: getShortId(c.id), 
-        name: c.name, 
-        role: c.role, 
-        color: { r: c.r, g: c.g, b: c.b, a: c.a } 
-      }));
-      downloadFile(JSON.stringify(data, null, 2), `${paletteData.name}.json`, 'application/json');
-    }
-
-    function downloadFile(content, filename, type) {
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; 
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function generatePalettePrefix() {
-      // Unix timestamp + random suffix to approximate OpenToonz-style key (e.g. 1611507682_2814)
-      return `${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 90000) + 1000}`;
-    }
-  </script>
+  <!-- Main JS -->
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
-
