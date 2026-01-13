@@ -110,6 +110,7 @@ export function initWheel() {
 function updateColorPreview() {
   const swatch = document.getElementById('color-preview-swatch');
   const hexDisplay = document.getElementById('color-preview-hex');
+  const eyedropperBtn = document.getElementById('sidebar-eyedropper-btn');
   
   if (!swatch || !hexDisplay) return;
   
@@ -118,6 +119,7 @@ function updateColorPreview() {
   if (idx < 0 || !wheel) {
     swatch.style.setProperty('--preview-color', 'transparent');
     hexDisplay.textContent = 'No color selected';
+    if (eyedropperBtn) eyedropperBtn.disabled = true;
     return;
   }
   
@@ -127,6 +129,12 @@ function updateColorPreview() {
   
   swatch.style.setProperty('--preview-color', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha / 255})`);
   hexDisplay.textContent = `${hex} (A: ${alpha})`;
+  
+  // Enable/disable eyedropper button based on selection
+  // idx 0 is bg color which cannot be changed, idx >= 1 can be edited
+  if (eyedropperBtn) {
+    eyedropperBtn.disabled = idx < 1;
+  }
 }
 
 /**
