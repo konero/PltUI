@@ -14,7 +14,7 @@ export function exportPalette() {
 
   let rootTag;
   if (paletteData.isStudioPalette) {
-    rootTag = `<palette name="${paletteData.name}">`;
+    rootTag = `<palette name="${paletteData.prefix}">`;
   } else {
     rootTag = `<palette id="${paletteData.originalId || '1'}">`;
   }
